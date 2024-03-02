@@ -23,7 +23,10 @@ exports.createUser = async (req, res) => {
     }
 
     // If there are no users with the same attributes, create a new user
+    console.log(req.body)
     const newUser = new UserModel(req.body);
+    console.log(newUser);
+    console.log(newUser._id);
     await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
@@ -97,18 +100,17 @@ exports.deleteUserById = async (req, res) => {
     const userId = req.params.id;
 
     // Update records referencing the deleted user
-    await LostObjectModel.updateMany({ owner: userId }, { owner: 'unknown user' });
-    await FoundObjectModel.updateMany({ userWhoFound: userId }, { userWhoFound: 'unknown user' });
-    await BidModel.deleteMany({ bidder: userId });
+    //await LostObjectModel.updateMany({ owner: userId }, { owner: 'unknown user' });
+    //await FoundObjectModel.updateMany({ userWhoFound: userId }, { userWhoFound: 'unknown user' });
+    //await BidModel.deleteMany({ bidder: userId });
 
     // Remove bids in auctions referencing the user
-    const auctions = await AuctionModel.find({ 'winnerBid.bidder': userId });
-    for (const auction of auctions) {
-      await BidModel.findByIdAndDelete(auction.winnerBid._id);
-      auction.winnerBid = null;
-      await auction.save();
-    }
-
+    // const auctions = await AuctionModel.find({ 'winnerBid.bidder': userId });
+    // for (const auction of auctions) {
+    //   await BidModel.findByIdAndDelete(auction.winnerBid._id);
+    //   auction.winnerBid = null;
+    //   await auction.save();
+    // }
     // Delete the user
     await UserModel.findByIdAndDelete(userId);
 
@@ -117,4 +119,20 @@ exports.deleteUserById = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const currentUser = await UserModel.findById(userId);
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(201).json({ currentUser });
+    }catch (err) {
+      return res.status(500)
+        .json({ error: `Server error when trying to fetch users.` });
+    };
+};
+
 
