@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 
 // Schema para User
 const UserSchema = new mongoose.Schema({
+  _id: mongoose.Schema.Types.ObjectId,
   name: String,
   email: { type: String, unique: true },
-  phone: String,
+  phone:String,
   birth: Date,
   status: String,
   nic: { type: String, unique: true },
