@@ -11,6 +11,14 @@ router.delete('/delete/:id', userController.deleteUserById);
 
 router.get('/profile/:id',userController.getUserInfo);
 
-
 //router.get('/findByEmail/:email', userController.
+
+//Routes for owner
+router.get('/owner/foundobjects/', userController.getListFoundObject);
+
+router.get('/owner/lostobjects/:id', userController.getListLostObject);
+
+router.get('/owners/:id', userController.getOwnerInfo);
+
+router.post('/owner/:id', userController.createOwner);
 module.exports = router;

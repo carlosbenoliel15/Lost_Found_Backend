@@ -1,6 +1,6 @@
 const User = require('../models/User');
 
-const { UserModel, BidderModel, OwnerModel } = require('../models/User');
+const { UserModel, BidderModel } = require('../models/User');
 
 exports.createUser = async (req, res) => {
   try {
