@@ -57,5 +57,6 @@ const FoundObjectSchema = new mongoose.Schema({
   endDate: Date
 });
 
-
 const FoundObjectModel = mongoose.model('FoundObject', FoundObjectSchema);
+
+module.exports = { LostObjectModel, FoundObjectModel, CategoryModel };
