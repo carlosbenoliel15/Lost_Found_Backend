@@ -14,3 +14,4 @@ router.get('/profile/:id',userController.getUserInfo);
 
 //router.get('/findByEmail/:email', userController.
 module.exports = router;
+
