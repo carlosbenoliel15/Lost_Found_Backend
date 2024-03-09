@@ -42,7 +42,6 @@ exports.createOwner = async (req, res) => {
     if (!userIdCheck) {
         return res.status(404).json({ error: 'User does not exist' });
     }
-
     const newOwner = new OwnerModel({ user: userId });
     await newOwner.save();
     res.status(200).json(newOwner);
