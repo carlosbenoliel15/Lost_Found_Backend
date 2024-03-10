@@ -97,6 +97,29 @@ exports.updateUserById = async (req, res) => {
   }
 };
 
+// Function to update user password with the provided ID
+exports.updatePassById = async (req, res) => {
+  try {
+    const userId = req.body.token;
+    const oldPass = req.body.oldPass;
+    const newPass = req.body.newPass;
+    const token = jwtDecode(userId);
+    const currentUser = await UserModel.findById(token["userId"]);
+    const userPass = currentUser.password;
+    const isMatch = await bcrypt.compare(oldPass, userPass);
+    if (!isMatch) {
+      return res.status(404).json({ error: 'Wrong password' });
+    }
+    const updatedUser = await UserModel.findByIdAndUpdate(currentUser, { password: newPass }, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+  }
+  catch (error) {
+    res.status(404).json({ error: 'User not found' });
+  }
+}
+
 
 
 exports.deleteUserById = async (req, res) => {
