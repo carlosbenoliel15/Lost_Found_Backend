@@ -5,7 +5,8 @@ const ownerController = require('../controllers/ownerController');
 
 // Rota para criar um novo usuário
 router.post('/signup', userController.createUser);
-router.put('/update/', userController.updateUserById);  
+router.put('/update/', userController.updateUserById);
+router.put('/updatePass/', userController.updatePassById);  
 router.delete('/delete/', userController.deleteUserById);
 router.get('/profile/',userController.getUserInfo);
 //router.get('/findByEmail/:email', userController.
