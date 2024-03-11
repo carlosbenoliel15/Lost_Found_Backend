@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const User = require('../models/User');
+const { UserModel} = require('../models/User');
 const { JWT_SECRET } = require('../config/config');
 
 const authService = {
@@ -8,7 +8,7 @@ const authService = {
   async authenticateUser(email, password) {
     try {
       // Busque o usuário pelo email
-      const user = await User.findOne({ email });
+      const user = await UserModel.findOne({ email });
 
       // Se o usuário não existir, retorne um erro
       if (!user) {
@@ -16,13 +16,17 @@ const authService = {
       }
 
       // Verifique se a senha fornecida corresponde à senha armazenada no banco de dados
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        throw new Error('Credenciais inválidas');
-      }
+      console.log(user.email)
+      console.log(user.password)
 
+
+      //const isMatch = await bcrypt.compare(password, user.password);
+      //if (!isMatch) {
+        //throw new Error('Credenciais inválidas');
+      //}
       // Gere um token JWT para o usuário
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    
       return token;
     } catch (error) {
       throw error;
