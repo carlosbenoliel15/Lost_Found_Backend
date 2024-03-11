@@ -1,6 +1,7 @@
+const { jwtDecode } = require("jwt-decode");
 const User = require('../models/User');
 
-const { UserModel} = require('../models/User');
+const { UserModel, BidderModel } = require('../models/User');
 
 exports.createUser = async (req, res) => {
   try {
@@ -38,40 +39,43 @@ exports.createUser = async (req, res) => {
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = req.body.token;
+    const token = jwtDecode(userId);
+    const currentUser = await UserModel.findById(token["userId"]);
+
     const updatedAttributes = req.body;
 
     // Check if there is already a user with the same email, NIC, or NIF
     if (updatedAttributes.email) {
       const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email });
-      if (existingEmailUser && existingEmailUser._id.toString() !== userId) {
+      if (existingEmailUser && existingEmailUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'Email is already in use' });
       }
     }
 
     if (updatedAttributes.nic) {
       const existingNicUser = await UserModel.findOne({ nic: updatedAttributes.nic });
-      if (existingNicUser && existingNicUser._id.toString() !== userId) {
+      if (existingNicUser && existingNicUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIC is already in use' });
       }
     }
 
     if (updatedAttributes.nif) {
       const existingNifUser = await UserModel.findOne({ nif: updatedAttributes.nif });
-      if (existingNifUser && existingNifUser._id.toString() !== userId) {
+      if (existingNifUser && existingNifUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIF is already in use' });
       }
     }
 
     // Check if the attributes to be updated are different from the existing ones
-    const currentUser = await UserModel.findById(userId);
-    if (!currentUser) {
+    const currentUser1 = await UserModel.findById(currentUser);
+    if (!currentUser1) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     let shouldUpdate = false;
     for (const key in updatedAttributes) {
-      if (currentUser[key] !== updatedAttributes[key]) {
+      if (currentUser1[key] !== updatedAttributes[key]) {
         shouldUpdate = true;
         break;
       }
@@ -93,12 +97,36 @@ exports.updateUserById = async (req, res) => {
   }
 };
 
+// Function to update user password with the provided ID
+exports.updatePassById = async (req, res) => {
+  try {
+    const userId = req.body.token;
+    const oldPass = req.body.oldPass;
+    const newPass = req.body.newPass;
+    const token = jwtDecode(userId);
+    const currentUser = await UserModel.findById(token["userId"]);
+    const userPass = currentUser.password;
+    const isMatch = await bcrypt.compare(oldPass, userPass);
+    if (!isMatch) {
+      return res.status(404).json({ error: 'Wrong password' });
+    }
+    const updatedUser = await UserModel.findByIdAndUpdate(currentUser, { password: newPass }, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+  }
+  catch (error) {
+    res.status(404).json({ error: 'User not found' });
+  }
+}
+
 
 
 exports.deleteUserById = async (req, res) => {
   try {
-    const userId = req.params.id;
-
+    const userId = req.body.token;
+    const token = jwtDecode(userId);
+    const currentUser = await UserModel.findById(token["userId"]);
     // Update records referencing the deleted user
     //await LostObjectModel.updateMany({ owner: userId }, { owner: 'unknown user' });
     //await FoundObjectModel.updateMany({ userWhoFound: userId }, { userWhoFound: 'unknown user' });
@@ -112,7 +140,7 @@ exports.deleteUserById = async (req, res) => {
     //   await auction.save();
     // }
     // Delete the user
-    await UserModel.findByIdAndDelete(userId);
+    await UserModel.findByIdAndDelete(currentUser);
 
     res.sendStatus(204);
   } catch (error) {
@@ -123,8 +151,9 @@ exports.deleteUserById = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const currentUser = await UserModel.findById(userId);
+    const userId = req.body.token;
+    const token = jwtDecode(userId);
+    const currentUser = await UserModel.findById(token["userId"]);
     if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }

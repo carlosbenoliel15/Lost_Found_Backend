@@ -1,19 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const bidderController=require('../controllers/bidderController')
+
+const bidderController=require('../controllers/bidderController');
+const ownerController = require('../controllers/ownerController');
 
 // User Routes
 router.post('/signup', userController.createUser);
+router.put('/update/', userController.updateUserById);
+router.put('/updatePass/', userController.updatePassById);  
+router.delete('/delete/', userController.deleteUserById);
+router.get('/profile/',userController.getUserInfo);
+//router.get('/findByEmail/:email', userController.
 
-router.put('/update/:id', userController.updateUserById);  
+//Routes for owner
+router.get('/owner/foundobjects/', ownerController.getListFoundObject);
+router.get('/owner/lostobjects/:id', ownerController.getListLostObject);
+router.get('/owners/:id', ownerController.getOwnerInfo);
+router.post('/owner/:id', ownerController.createOwner);
 
-router.delete('/delete/:id', userController.deleteUserById);
 
-router.get('/profile/:id',userController.getUserInfo);
-
-
-//Bidder Routes:
 
 router.post('/bidder/', bidderController.createBidder);
 
