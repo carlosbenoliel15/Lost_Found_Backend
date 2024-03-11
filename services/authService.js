@@ -19,14 +19,14 @@ const authService = {
       console.log(user.email)
       console.log(user.password)
 
-      
+
       //const isMatch = await bcrypt.compare(password, user.password);
       //if (!isMatch) {
         //throw new Error('Credenciais inválidas');
       //}
-
       // Gere um token JWT para o usuário
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    
       return token;
     } catch (error) {
       throw error;
