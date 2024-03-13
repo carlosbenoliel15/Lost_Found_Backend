@@ -151,7 +151,7 @@ exports.deleteUserById = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
   try {
-    const userId = req.body.token;
+    const userId = req.body;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
     if (!currentUser) {
