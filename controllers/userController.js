@@ -39,15 +39,16 @@ exports.createUser = async (req, res) => {
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
   try {
-    const userId = req.body.token;
-    const token = jwtDecode(userId);
+    const userToken = req.body.token;
+    const token = jwtDecode(userToken);
     const currentUser = await UserModel.findById(token["userId"]);
+    console.log(currentUser)
 
     const updatedAttributes = req.body;
-
+    console.log(updatedAttributes)
     // Check if there is already a user with the same email, NIC, or NIF
     if (updatedAttributes.email) {
-      const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email });
+      const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email, _id: { $ne: currentUser._id } });
       if (existingEmailUser && existingEmailUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'Email is already in use' });
       }
@@ -100,6 +101,7 @@ exports.updateUserById = async (req, res) => {
 // Function to update user password with the provided ID
 exports.updatePassById = async (req, res) => {
   try {
+    
     const userId = req.body.token;
     const oldPass = req.body.oldPass;
     const newPass = req.body.newPass;
@@ -151,9 +153,19 @@ exports.deleteUserById = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
   try {
-    const userId = req.body;
+    const userId = req.params.token;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
+  
+    // const formattedDate = currentUser.birth.toLocaleDateString('en-GB', {
+    //     day: '2-digit',
+    //     month: '2-digit',
+    //     year: 'numeric'
+    // });
+
+    // currentUser.birth = formattedDate;
+    // console.log('formattcurrentUser.birth--',currentUser.birth); // Output will be in dd-mm-yyyy format
+
     if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }
