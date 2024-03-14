@@ -39,29 +39,30 @@ exports.createUser = async (req, res) => {
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
   try {
-    const userId = req.body.token;
-    const token = jwtDecode(userId);
+    const userToken = req.body.token;
+    const token = jwtDecode(userToken);
     const currentUser = await UserModel.findById(token["userId"]);
+    console.log(currentUser)
 
     const updatedAttributes = req.body;
-
+    console.log(updatedAttributes)
     // Check if there is already a user with the same email, NIC, or NIF
     if (updatedAttributes.email) {
-      const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email });
+      const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email, _id: { $ne: currentUser._id } });
       if (existingEmailUser && existingEmailUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'Email is already in use' });
       }
     }
 
     if (updatedAttributes.nic) {
-      const existingNicUser = await UserModel.findOne({ nic: updatedAttributes.nic });
+      const existingNicUser = await UserModel.findOne({ nic: updatedAttributes.nic, _id: { $ne: currentUser._id  }});
       if (existingNicUser && existingNicUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIC is already in use' });
       }
     }
 
     if (updatedAttributes.nif) {
-      const existingNifUser = await UserModel.findOne({ nif: updatedAttributes.nif });
+      const existingNifUser = await UserModel.findOne({ nif: updatedAttributes.nif, _id: { $ne: currentUser._id  }});
       if (existingNifUser && existingNifUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIF is already in use' });
       }
@@ -86,7 +87,7 @@ exports.updateUserById = async (req, res) => {
     }
 
     // Update the user
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, updatedAttributes, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -99,32 +100,63 @@ exports.updateUserById = async (req, res) => {
 
 // Function to update user password with the provided ID
 exports.updatePassById = async (req, res) => {
+  console.log(123121)
   try {
     const userId = req.body.token;
-    const oldPass = req.body.oldPass;
-    const newPass = req.body.newPass;
+    const oldPass = req.body.password;
+    const newPass = req.body.newPassword;
     const token = jwtDecode(userId);
-    const currentUser = await UserModel.findById(token["userId"]);
-    const userPass = currentUser.password;
-    const isMatch = await bcrypt.compare(oldPass, userPass);
-    if (!isMatch) {
-      return res.status(404).json({ error: 'Wrong password' });
-    }
-    const updatedUser = await UserModel.findByIdAndUpdate(currentUser, { password: newPass }, { new: true });
-    if (!updatedUser) {
+
+    const currentUser = await UserModel.findById(token.userId);
+    if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    if (oldPass !== currentUser.password) {
+      return res.status(400).json({ error: 'Wrong password' });
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(token.userId, { password: newPass }, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'Failed to update password' });
+    }
+    return res.status(200).json({ message: 'Password updated successfully', user: updatedUser });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
   }
-  catch (error) {
-    res.status(404).json({ error: 'User not found' });
+}
+
+
+async function updatePassword(req, res) {
+  try {
+      // Logic to update password
+      const userId = req.params.userId;
+      const newPassword = req.body.newPassword;
+
+      // Check if user exists (replace this with your own logic for checking user existence)
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Here you would perform the logic to update the password
+      // (replace this with your own logic for updating the password)
+
+      // If password is successfully updated, send a success response
+      return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+      // If an error occurs during processing, return an error message
+      console.error('Error updating password:', error);
+      return res.status(500).json({ error: 'Error updating password' });
   }
 }
 
 
 
+
 exports.deleteUserById = async (req, res) => {
   try {
-    const userId = req.body.token;
+    const userId = req.params.token;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
     // Update records referencing the deleted user
@@ -151,9 +183,19 @@ exports.deleteUserById = async (req, res) => {
 
 exports.getUserInfo = async (req, res) => {
   try {
-    const userId = req.body;
+    const userId = req.params.token;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
+  
+    // const formattedDate = currentUser.birth.toLocaleDateString('en-GB', {
+    //     day: '2-digit',
+    //     month: '2-digit',
+    //     year: 'numeric'
+    // });
+
+    // currentUser.birth = formattedDate;
+    // console.log('formattcurrentUser.birth--',currentUser.birth); // Output will be in dd-mm-yyyy format
+
     if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }

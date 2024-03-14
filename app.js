@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-
+const cors = require('cors');
 // Configurações
 require('./config/config');
 require('./config/db');
-
+app.use(cors());
 // Middlewares
 app.use(express.json());
 
