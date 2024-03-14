@@ -55,14 +55,14 @@ exports.updateUserById = async (req, res) => {
     }
 
     if (updatedAttributes.nic) {
-      const existingNicUser = await UserModel.findOne({ nic: updatedAttributes.nic });
+      const existingNicUser = await UserModel.findOne({ nic: updatedAttributes.nic, _id: { $ne: currentUser._id  }});
       if (existingNicUser && existingNicUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIC is already in use' });
       }
     }
 
     if (updatedAttributes.nif) {
-      const existingNifUser = await UserModel.findOne({ nif: updatedAttributes.nif });
+      const existingNifUser = await UserModel.findOne({ nif: updatedAttributes.nif, _id: { $ne: currentUser._id  }});
       if (existingNifUser && existingNifUser._id.toString() !== currentUser) {
         return res.status(400).json({ error: 'NIF is already in use' });
       }
@@ -87,7 +87,7 @@ exports.updateUserById = async (req, res) => {
     }
 
     // Update the user
-    const updatedUser = await UserModel.findByIdAndUpdate(userId, updatedAttributes, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -103,22 +103,40 @@ exports.updatePassById = async (req, res) => {
   try {
     
     const userId = req.body.token;
-    const oldPass = req.body.oldPass;
-    const newPass = req.body.newPass;
+    const oldPass = req.body.password;
+    const newPass = req.body.newPassword;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
     const userPass = currentUser.password;
-    const isMatch = await bcrypt.compare(oldPass, userPass);
+    console.log(req.body)
+
+    console.log('userPass--',userPass)
+    console.log('oldPass--',oldPass)
+    console.log('newPass--',newPass)
+
+
+    let isMatch = false;
+    try{
+      if (oldPass===userPass){
+        console.log("igual")
+        isMatch = true;
+      }
+      // const isMatch = await bcrypt.compare(oldPass, userPass);
+    }catch{
+      console.log("aqui")
+    }
     if (!isMatch) {
       return res.status(404).json({ error: 'Wrong password' });
     }
-    const updatedUser = await UserModel.findByIdAndUpdate(currentUser, { password: newPass }, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], { password: newPass }, { new: true });
     if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+      console.log("olaolaoaolaoaloal")
+      return res.status(404).json({ error: 'User not found2' });
     }
   }
   catch (error) {
-    res.status(404).json({ error: 'User not found' });
+    console.log("--------")
+    res.status(404).json({ error: 'User not found1' });
   }
 }
 
@@ -126,7 +144,7 @@ exports.updatePassById = async (req, res) => {
 
 exports.deleteUserById = async (req, res) => {
   try {
-    const userId = req.body.token;
+    const userId = req.params.token;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
     // Update records referencing the deleted user

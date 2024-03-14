@@ -6,10 +6,10 @@ const bidderController=require('../controllers/bidderController');
 const ownerController = require('../controllers/ownerController');
 
 // User Routes
-router.post('/signup', userController.createUser);
+router.post('/signup/', userController.createUser);
 router.put('/update/', userController.updateUserById);
 router.put('/updatePass/', userController.updatePassById);  
-router.delete('/delete/', userController.deleteUserById);
+router.delete('/delete/:token', userController.deleteUserById);
 router.get('/profile/:token',userController.getUserInfo);
 //router.get('/findByEmail/:email', userController.
 
