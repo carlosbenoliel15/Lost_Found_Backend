@@ -100,45 +100,57 @@ exports.updateUserById = async (req, res) => {
 
 // Function to update user password with the provided ID
 exports.updatePassById = async (req, res) => {
+  console.log(123121)
   try {
-    
     const userId = req.body.token;
     const oldPass = req.body.password;
     const newPass = req.body.newPassword;
     const token = jwtDecode(userId);
-    const currentUser = await UserModel.findById(token["userId"]);
-    const userPass = currentUser.password;
-    console.log(req.body)
 
-    console.log('userPass--',userPass)
-    console.log('oldPass--',oldPass)
-    console.log('newPass--',newPass)
-
-
-    let isMatch = false;
-    try{
-      if (oldPass===userPass){
-        console.log("igual")
-        isMatch = true;
-      }
-      // const isMatch = await bcrypt.compare(oldPass, userPass);
-    }catch{
-      console.log("aqui")
+    const currentUser = await UserModel.findById(token.userId);
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    if (!isMatch) {
-      return res.status(404).json({ error: 'Wrong password' });
+
+    if (oldPass !== currentUser.password) {
+      return res.status(400).json({ error: 'Wrong password' });
     }
-    const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], { password: newPass }, { new: true });
+
+    const updatedUser = await UserModel.findByIdAndUpdate(token.userId, { password: newPass }, { new: true });
     if (!updatedUser) {
-      console.log("olaolaoaolaoaloal")
-      return res.status(404).json({ error: 'User not found2' });
+      return res.status(404).json({ error: 'Failed to update password' });
     }
-  }
-  catch (error) {
-    console.log("--------")
-    res.status(404).json({ error: 'User not found1' });
+    return res.status(200).json({ message: 'Password updated successfully', user: updatedUser });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
+
+async function updatePassword(req, res) {
+  try {
+      // Logic to update password
+      const userId = req.params.userId;
+      const newPassword = req.body.newPassword;
+
+      // Check if user exists (replace this with your own logic for checking user existence)
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Here you would perform the logic to update the password
+      // (replace this with your own logic for updating the password)
+
+      // If password is successfully updated, send a success response
+      return res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+      // If an error occurs during processing, return an error message
+      console.error('Error updating password:', error);
+      return res.status(500).json({ error: 'Error updating password' });
+  }
+}
+
 
 
 
