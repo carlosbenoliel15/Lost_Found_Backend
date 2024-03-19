@@ -14,16 +14,11 @@ const authService = {
       if (!user) {
         throw new Error('Usuário não encontrado');
       }
+      
 
-      // Verifique se a senha fornecida corresponde à senha armazenada no banco de dados
-      console.log(user.email)
-      console.log(user.password)
-
-
-      //const isMatch = await bcrypt.compare(password, user.password);
-      //if (!isMatch) {
-        //throw new Error('Credenciais inválidas');
-      //}
+      if(user.password!== password){
+        throw new Error('credencias incorretas');
+      }
       // Gere um token JWT para o usuário
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
     
