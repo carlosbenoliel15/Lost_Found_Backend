@@ -11,10 +11,13 @@ app.use(express.json());
 // Rotas
 const authRoutes = require('./routes/authRoutes');
 const  userRoutes = require('./routes/userRoutes');
+const policeRoutes=require('././routes/policeRoutes')
 
 app.use('/api/auth', authRoutes);
 
 app.use('/api/users', userRoutes);
+
+app.use('/api/police',policeRoutes)
 
 // Middleware de tratamento de erros
 app.use(require('./middleware/errorMiddleware'));

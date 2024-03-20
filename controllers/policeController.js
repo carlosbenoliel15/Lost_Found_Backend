@@ -1,7 +1,6 @@
-const PoliceOfficerModel = require('../models/Police/PoliceOfficerModel');
-const PoliceStationModel=require('../models/Police/PoliceStationModel'); 
+const {PoliceStationModel, PoliceOfficerModel}= require('../models/Police');
 const UserModel = require('../models/User');
-const FoundObjectModel = require('../models/FoundObject');
+const { LostObjectModel, FoundObjectModel, CategoryModel } = require('../models/Object');
 
 exports.createPoliceStation = async (req, res) => {
   try {
