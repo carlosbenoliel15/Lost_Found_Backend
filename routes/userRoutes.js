@@ -4,9 +4,12 @@ const userController = require('../controllers/userController');
 
 const bidderController=require('../controllers/bidderController');
 const ownerController = require('../controllers/ownerController');
+const multer = require("multer");
+
+const upload = multer({ dest: 'uploads/' })
 
 // User Routes
-router.post('/signup/', userController.createUser);
+router.post('/signup/',upload.single('profileImage'), userController.createUser);
 router.put('/update/', userController.updateUserById);
 router.put('/updatePass/', userController.updatePassById);  
 router.delete('/delete/:token', userController.deleteUserById);

@@ -1,12 +1,25 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
+// Set Multer
+const multer  = require('multer')
+// Require the cloudinary library
+const cloudinary = require('cloudinary').v2;
 // Configurações
 require('./config/config');
 require('./config/db');
+cloudinary.config({
+    secure: true,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 app.use(cors());
 // Middlewares
-app.use(express.json());
+/*app.use(express.json());*/
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Rotas
 const authRoutes = require('./routes/authRoutes');
