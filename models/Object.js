@@ -7,7 +7,6 @@ const CategorySchema = new mongoose.Schema({
 
 const CategoryModel = mongoose.model('Category', CategorySchema);
 
-// Schema for LostObject
 const LostObjectSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required:true}, // Reference to Category
@@ -22,7 +21,7 @@ const LostObjectSchema = new mongoose.Schema({
   price:{
     type:Number,
     default:0
-  }, // Price field added
+  }, 
   status: { type: String, enum: ['Lost', 'Claimed'], default: 'Lost' }
 });
 
@@ -31,8 +30,9 @@ const LostObjectModel = mongoose.model('LostObject', LostObjectSchema);
 // Schema for FoundObject
 const FoundObjectSchema = new mongoose.Schema({
   userWhoFound: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true},
-  policeOfficerThatReceived: { type: mongoose.Schema.Types.ObjectId, ref: 'PoliceOfficer',required: true},
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required: true},
+  policeOfficerThatReceived: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required: true},
+  category: { type:String,required: true},
+  //category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required: true},
   description: { 
     type: String,
     required: true 

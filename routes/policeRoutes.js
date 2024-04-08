@@ -9,7 +9,6 @@ const {
   updatePoliceOfficer,
   getPoliceOfficerById,
   deletePoliceOfficer,
-  registerUserByPolice,
   createFoundObjectByPolice,
   updateFoundObjectByPolice,
   getFoundObjectByIdByPolice,
@@ -27,9 +26,7 @@ router.put('/police-officers/:id', updatePoliceOfficer);
 router.get('/police-officers/:id', getPoliceOfficerById);
 router.delete('/police-officers/:id', deletePoliceOfficer);
 
-router.post('/register-user-by-police', registerUserByPolice);
-
-router.post('/found-objects-by-police', createFoundObjectByPolice);
+router.post('/found-objects-by-police/', createFoundObjectByPolice);
 router.put('/found-objects-by-police/:id', updateFoundObjectByPolice);
 router.get('/found-objects-by-police/:id', getFoundObjectByIdByPolice);
 router.delete('/found-objects-by-police/:id', deleteFoundObjectByPolice);
