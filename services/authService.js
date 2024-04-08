@@ -7,10 +7,8 @@ const authService = {
   // Função para autenticar um usuário
   async authenticateUser(email, password) {
     try {
-      // Busque o usuário pelo email
-      const user = await UserModel.findOne({ email });
 
-      // Se o usuário não existir, retorne um erro
+      const user = await UserModel.findOne({ email });
       if (!user) {
         throw new Error('Usuário não encontrado');
       }

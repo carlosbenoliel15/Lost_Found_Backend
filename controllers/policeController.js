@@ -1,5 +1,6 @@
 const {PoliceStationModel, PoliceOfficerModel}= require('../models/Police');
-const UserModel = require('../models/User');
+const {UserModel} = require('../models/User');
+const { jwtDecode } = require("jwt-decode");
 const { LostObjectModel, FoundObjectModel, CategoryModel } = require('../models/Object');
 
 exports.createPoliceStation = async (req, res) => {
@@ -82,25 +83,44 @@ exports.deletePoliceOfficer = async (req, res) => {
   }
 };
 
-exports.registerUserByPolice = async (req, res) => {
-  try {
-    const newUser = new UserModel(req.body);
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
 exports.createFoundObjectByPolice = async (req, res) => {
   try {
-    const newFoundObject = new FoundObjectModel(req.body);
+
+    let user;
+    console.log(req.body)
+    if (req.body.userData.isUserRegistered === true) {
+      user = await UserModel.findOne({ nic: req.body.userData.nic, email: req.body.userData.email });
+    } else {
+      const newUser = new UserModel({
+        firstName: req.body.userData.firstName,
+        lastName: req.body.userData.lastName,
+        email: req.body.userData.email,
+        address: req.body.userData.address,
+        phone: req.body.userData.phone,
+        birth: req.body.userData.birth,
+        nic: req.body.userData.nic,
+        nif: req.body.useData.nif,
+        gender: req.body.userData.gender,
+      });
+      user = await newUser.save();
+    }
+
+    const newFoundObject = new FoundObjectModel({
+      category: req.body.foundObjectData.category,
+      description: req.body.foundObjectData.description,
+      location: req.body.foundObjectData.location,
+      userWhoFound: user._id,
+      policeOfficerThatReceived: user._id
+    });
+
     await newFoundObject.save();
     res.status(201).json(newFoundObject);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
+
 exports.updateFoundObjectByPolice = async (req, res) => {
   try {
     const { id } = req.params;

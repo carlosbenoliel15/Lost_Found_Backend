@@ -22,12 +22,7 @@ exports.createUser = async (req, res) => {
     if (existingNifUser) {
       return res.status(400).json({ error: 'NIF is already in use' });
     }
-
-    // If there are no users with the same attributes, create a new user
-    console.log(req.body)
     const newUser = new UserModel(req.body);
-    console.log(newUser);
-    console.log(newUser._id);
     await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
