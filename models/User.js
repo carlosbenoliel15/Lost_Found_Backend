@@ -13,7 +13,8 @@ const UserSchema = new mongoose.Schema({
   status: String,
   nic: { type: String, unique: true },
   nif: { type: String, unique: true },
-  gender: String
+  gender: String,
+  profileImage: String,
 });
 
 const UserModel = mongoose.model('User', UserSchema);

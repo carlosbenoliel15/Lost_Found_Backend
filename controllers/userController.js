@@ -2,6 +2,7 @@ const { jwtDecode } = require("jwt-decode");
 const User = require('../models/User');
 
 const { UserModel, BidderModel } = require('../models/User');
+const cloudinary = require("cloudinary");
 
 exports.createUser = async (req, res) => {
   try {
@@ -22,9 +23,23 @@ exports.createUser = async (req, res) => {
     if (existingNifUser) {
       return res.status(400).json({ error: 'NIF is already in use' });
     }
-    const newUser = new UserModel(req.body);
-    await newUser.save();
-    res.status(201).json(newUser);
+
+    // If there are no users with the same attributes, create a new user
+
+    cloudinary.v2.uploader
+        .upload('uploads/' + req.file.filename, { folder: 'profileImages' })
+        .then( async result => {
+              req.body['profileImage'] = result.public_id;
+              const newUser = new UserModel(req.body);
+              console.log(newUser);
+              console.log(newUser._id);
+              await newUser.save();
+              res.status(201).json(newUser);
+            }
+        , error => {
+              res.status(400).json({ error: error.message });
+        });
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
