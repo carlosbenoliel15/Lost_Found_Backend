@@ -4,6 +4,9 @@ const User = require('../models/User');
 const { UserModel, BidderModel } = require('../models/User');
 const cloudinary = require("cloudinary");
 
+const cloudinaryService = require('../services/cloudinaryService');
+
+
 exports.createUser = async (req, res) => {
   try {
     // Check if there is already a user with the same email
@@ -26,9 +29,7 @@ exports.createUser = async (req, res) => {
 
     // If there are no users with the same attributes, create a new user
 
-    cloudinary.v2.uploader
-        .upload('uploads/' + req.file.filename, { folder: 'profileImages' })
-        .then( async result => {
+    cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
               req.body['profileImage'] = result.public_id;
               const newUser = new UserModel(req.body);
               console.log(newUser);
@@ -209,11 +210,29 @@ exports.getUserInfo = async (req, res) => {
     if (!currentUser) {
       return res.status(404).json({ error: 'User not found' });
     }
-    return res.status(201).json({ currentUser });
+    return res.status(200).json({ currentUser });
     }catch (err) {
       return res.status(500)
-        .json({ error: `Server error when trying to fetch users.` });
+        .json({ error: `Server error when trying to fetch users. ` + err });
     };
+
+
 };
+
+exports.getProfileImage = async (req, res) => {
+
+  try {
+    const publicId = req.params.id;
+    const image = await cloudinaryService.getImage("profileImages/"+publicId);
+
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    return res.status(200).json({ image });
+  }catch (err) {
+    return res.status(500)
+        .json({ error: err });
+  };
+}
 
 

@@ -14,6 +14,7 @@ router.put('/update/', userController.updateUserById);
 router.put('/updatePass/', userController.updatePassById);  
 router.delete('/delete/:token', userController.deleteUserById);
 router.get('/profile/:token',userController.getUserInfo);
+router.get('/profileImage/:id', userController.getProfileImage);
 //router.get('/findByEmail/:email', userController.
 
 //Routes for owner
@@ -21,7 +22,6 @@ router.get('/owner/foundobjects/', ownerController.getListFoundObject);
 router.get('/owner/lostobjects/:id', ownerController.getListLostObject);
 router.get('/owners/:id', ownerController.getOwnerInfo);
 router.post('/owner/:id', ownerController.createOwner);
-
 
 
 router.post('/bidder/', bidderController.createBidder);
