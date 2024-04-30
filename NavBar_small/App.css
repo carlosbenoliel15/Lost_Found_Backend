@@ -1,0 +1,177 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px; 
+  background-color: #fff; 
+}
+
+.logo {
+  display: block;
+  height: auto;
+  width: auto;
+}
+
+.nav-items {
+  display: flex;
+  align-items: center;
+}
+
+.nav-items button {
+  padding: 10px 20px; 
+  border: 1px solid #000; 
+  background-color: #fff; 
+  color: #000;
+  font-weight: bold; 
+  border-radius: 20px;
+  cursor: pointer;
+  margin-left: 10px; 
+  outline: none; 
+}
+
+.nav-items button.sign-in {
+  width: Fixed (173.88px)px;
+  height: Fixed (51px)px;
+  top: 25px;
+  left: 937.35px;
+  padding: 16px 24px 16px 24px;
+  gap: 10px;
+  border-radius: 20px 20px 20px 20px;
+  border: 1px 0px 0px 0px;
+  opacity: 0px;
+}
+
+.nav-items button.menu {
+  background-color: #000; 
+  color: #fff; 
+  width: Fixed (174px)px;
+  height: Hug (52px)px;
+  padding: 16px 24px 16px 24px;
+  gap: 10px;
+  border-radius: 20px 20px 20px 20px;
+  opacity: 0px;
+}
+
+.nav-items button:hover {
+  background-color: #f2f2f2; 
+}
+
+.logo-wrapper {
+  background-color: #fff;
+  width: 241.83px;
+  height: 56px;
+  top: 23px;
+  left: 118.92px;
+  gap: 0px;
+  opacity: 0px;
+  display: inline-block;
+  padding: 5px; 
+  border-radius: 5px;
+}
+
+.toggle-switch {
+  height: 25px;
+  width: auto;
+  margin: 0 10px; 
+  cursor: pointer; 
+}
+
+.nav-switch img {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: left 0.2s;
+}
+
+.switch-off img {
+  left: 2px; 
+}
+
+.switch-on img {
+  left: 25px; 
+}
+
+.nav-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px; 
+  width: 21px;
+  height: 21px; 
+  background-color: white;
+  border-radius: 50%; 
+  transition: all 0.3s; 
+}
+
+.switch-on {
+  background-color: #4CAF50;
+}
+
+.switch-on::before {
+  left: 27px;
+}
+
+.toggle-ball {
+  width: 25px;
+  height: 25px;
+  background-color: #fff; 
+  border: 2px solid #000; 
+  border-radius: 50%; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: left 0.2s; 
+}
+
+.on .toggle-ball {
+  left: 25px; 
+  background-color: #8BC34A;
+}
+
+.nav-switch {
+  width: 50px;
+  height: 25px;
+  background-color: #8BC34A; 
+  border-radius: 12.5px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-ball {
+  width: 25px;
+  height: 25px;
+  background-color: #fff; 
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: left 0.2s; 
+}
+
+.sun-rays {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 21px;
+  height: 21px;
+  background-color: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  transition: background-color 0.2s, left 0.2s;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  z-index: -1;
+}
+
+.nav-switch.on {
+  background-color: #8BC34A;
+}
+
+.nav-switch.on .toggle-ball {
+  left: calc(100% - 25px); 
+}
+
+.nav-switch.on .sun-rays {
+  left: 28px; 
+  background-color: #8BC34A;
+}
