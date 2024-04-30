@@ -1,0 +1,273 @@
+/* Estilos generales */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif; /* o cualquier fuente que estés utilizando */
+}
+
+.App {
+  text-align: center;
+}
+
+/* Estilos para la barra de navegación */
+.navbar {
+  background-color: #FFFFFF; /* Fondo blanco o el color de fondo que prefieras */
+  padding: 10px 20px; /* Espacio alrededor del contenido dentro de la navbar */
+  display: flex; /* Utiliza flexbox para el layout */
+  justify-content: space-between; /* Distribuye el espacio entre logo y controles */
+  align-items: center; /* Alinea los elementos verticalmente */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para dar profundidad */
+}
+
+.navbar-logo {
+  height: 50px; /* Altura del logo */
+  width: auto; /* Mantiene la proporción de la imagen */
+  
+}
+
+/* Contenedor para los elementos de control como búsqueda, sign in y menú */
+.navbar-controls {
+  display: flex; /* También utiliza flexbox para alinear horizontalmente */
+  align-items: center;
+}
+
+
+
+/* Estilo para cualquier ícono en la barra de navegación */
+.navbar-icon {
+  margin-right: 20px; /* Espacio a la derecha de los íconos */
+  cursor: pointer;
+}
+
+/* Botones de sign in y menú */
+.sign-in-button, .menu-button {
+  border: none;
+  background-color: #000000; /* Color de fondo de los botones */
+  color: #FFFFFF; /* Color de texto de los botones */
+  padding: 10px 15px; /* Espacio dentro de los botones */
+  font-size: 14px; /* Tamaño de texto de los botones */
+  margin-left: 10px; /* Espacio a la izquierda de los botones */
+  cursor: pointer;
+  text-transform: uppercase; /* Texto en mayúsculas para los botones */
+  outline: none; /* Remueve el contorno que se muestra al hacer clic */
+}
+
+.sign-in-button:hover, .menu-button:hover {
+  background-color: #333333; /* Color de fondo al pasar el ratón por encima */
+}
+
+/* Asegúrate de añadir los media queries necesarios para hacer tu barra de navegación responsive */
+@media (max-width: 768px) {
+  .navbar-controls {
+    flex-direction: column; /* Los controles se apilan verticalmente en pantallas pequeñas */
+  }
+}
+
+/* Estilos para la barra de navegación */
+.navbar {
+  /* Tus estilos existentes para la navbar */
+}
+
+.navbar-switch-toggle {
+  cursor: pointer; /* Cambia el cursor para indicar que es un botón */
+  /* Añade estilos adicionales si son necesarios */
+}
+
+/* Estilos para el overlay del menú cuando está activado */
+.menu-overlay {
+  /* Tus estilos existentes para el overlay del menú */
+  animation: slideDown 50ms ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+
+.menu-option {
+  padding: 10px 20px;
+  border: none;
+  background: white; /* Cambiar el fondo a blanco */
+  cursor: pointer;
+  font-size: 16px; /* Ajustar el tamaño de fuente según sea necesario */
+  margin-top: 1mm; /* Agregar un margen superior de 1 milímetro */
+}
+
+.warning {
+  background-color: #ffcccc; /* Fondo rojo claro */
+  color: #ff0000; /* Texto rojo */
+  padding: 10px; /* Espaciado interno */
+  margin-top: 10px; /* Espaciado superior */
+}
+
+
+
+.menu-option:hover {
+  background-color: #ddd; /* Change hover effect as needed */
+}
+
+.wallet-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+
+.wallet-details {
+  margin-top: 10px;
+}
+
+
+
+.wallet-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px; /* Espaciado entre elementos, si es necesario */
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.wallet-details {
+  padding: 10px;
+}
+
+
+
+.wallet-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 10px; /* Espaciado entre elementos */
+  justify-content: center;
+  align-items: center;
+}
+
+
+.wallet-details {
+  padding: 10px;
+  text-align: center; /* Centrar el texto si es necesario */
+}
+
+
+.wallet-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px; /* Espaciado entre elementos */
+  padding: 16px; /* Ajustar según el diseño */
+  justify-content: center;
+  align-items: center;
+}
+
+
+.wallet-image {
+  width: 100%;
+  height: auto;
+  padding-bottom: 0;
+  object-fit: cover; /* Asegura que la imagen cubra el área designada */
+}
+
+.wallet-info {
+  padding: 16px;
+  text-align: left; /* Alineación del texto a la izquierda */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Espacio entre nombre, precio y botón */
+}
+
+.wallet-name {
+  margin-top: -4px;
+  margin-top: 0;
+  font-size: 1.2em; /* Tamaño más grande para el nombre */
+  margin-bottom: 0.5em; /* Espacio debajo del nombre */
+}
+
+.wallet-price {
+  font-size: 1.1em; /* Tamaño ligeramente más grande para el precio */
+  color: #333; /* Color oscuro para el precio */
+  margin-bottom: 0.5em;
+}
+
+.view-auction-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 149px;
+  height: 56px;
+  padding: 16px 24px;
+  background-color: #3CB684;
+  /* Cambia este color al verde que prefieras */
+  color: #FFFFFF; /* Asumiendo que el texto debería ser blanco */
+  border: none; /* Elimina el borde */
+  border-radius: 20px 0 20px 0;
+  opacity: 1;
+  /* Otros estilos que desees añadir, como sombras o lo que sea necesario */
+}
+
+
+.sign-in-button {
+  background-color: white; /* Fondo blanco */
+  border: 1px solid black; /* Borde negro */
+  color: black; /* Color del texto negro */
+  padding: 8px 16px; /* Ajuste del padding según sea necesario */
+  cursor: pointer;
+}
+
+.sign-in-button:hover {
+  background-color: #f0f0f0; /* Cambia el color de fondo al pasar el mouse */
+}
+.sign-in-button {
+  background-color: white; /* Fondo blanco */
+  border: 1px solid black; /* Borde negro */
+  border-radius: 8px; /* Esquinas redondeadas */
+  color: black; /* Color del texto negro */
+  padding: 8px 16px; /* Ajuste del padding según sea necesario */
+  cursor: pointer;
+}
+
+.sign-in-button:hover {
+  background-color: #f0f0f0; /* Cambia el color de fondo al pasar el mouse */
+}
+
+
+.menu-button {
+  background-color: black; /* Fondo negro */
+  border: 1px solid black; /* Borde negro */
+  border-radius: 8px; /* Esquinas redondeadas */
+  color: white; /* Texto blanco */
+  padding: 8px 16px; /* Ajuste del padding según sea necesario */
+  cursor: pointer;
+}
+
+
+
+.wallet-item {
+  position: relative; /* Esto es crucial para el posicionamiento absoluto de los hijos */
+  /* Resto de tus estilos para .wallet-item */
+  border: 1px solid #000000; /* Esto añade un borde negro */
+  border-radius: 10px; /* 
+    /* Resto de los estilos */
+  
+}
+
+
+
+
+
+
+
+.real-leather {
+  margin-left: 0; /* Alinea el texto a la izquierda */
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  text-align: left; /* Alineación a la izquierda */
+  margin-top: -4px; /* Ajusta el espacio encima del texto "Real Lether" */
+  /* Quitar width, height, top, left, y opacity si estaban definidos anteriormente */
+}
