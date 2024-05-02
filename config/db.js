@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const dbURI = "mongodb://10.182.0.30:27017,10.182.0.31:27017/?replicaSet=rs0";
+const dbURI = "mongodb://35.219.140.144:27017,35.219.169.95:27017/?replicaSet=rs0"
 //process.env.MONGODB_URI ;
 
 mongoose.connect(dbURI, {
