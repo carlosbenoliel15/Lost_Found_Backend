@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const dbURI = "mongodb+srv://teste:Teste123456789@cluster0.xgzastz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const dbURI = "mongodb://35.219.140.144:27017,35.219.169.95:27017/?replicaSet=rs0";
 //process.env.MONGODB_URI ;
 
 mongoose.connect(dbURI, {
