@@ -60,7 +60,7 @@ exports.updateLostObject = async (req, res) => {
 exports.deleteLostObject = async (req, res) => {
   try {
     const lostObjectId = req.params.lostObjectId;
-    const deletedLostObject = await LostObjectModel.findByIdAndRemove(lostObjectId);
+    const deletedLostObject = await LostObjectModel.findByIdAndDelete(lostObjectId);
     if (!deletedLostObject) {
       return res.status(404).json({ error: 'LostObject not found' });
     }
@@ -126,7 +126,7 @@ exports.updateFoundObject = async (req, res) => {
 exports.deleteFoundObject = async (req, res) => {
   try {
     const foundObjectId = req.params.foundObjectId;
-    const deletedFoundObject = await FoundObjectModel.findByIdAndRemove(foundObjectId);
+    const deletedFoundObject = await FoundObjectModel.findByIdAndDelete(foundObjectId);
     if (!deletedFoundObject) {
       return res.status(404).json({ error: 'FoundObject not found' });
     }

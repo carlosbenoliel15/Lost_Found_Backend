@@ -23,9 +23,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Rotas
 const authRoutes = require('./routes/authRoutes');
-const  userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 const policeRoutes=require('././routes/policeRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const objectRoutes = require('./routes/objectRoutes'); 
 
 app.use('/api/auth', authRoutes);
 
@@ -34,6 +36,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/police',policeRoutes)
 
 app.use('/api/auction', auctionRoutes);
+
+app.use('/api/category', categoryRoutes);
+
+app.use('/api/', objectRoutes);
 
 // Middleware de tratamento de erros
 app.use(require('./middleware/errorMiddleware'));
