@@ -70,6 +70,19 @@ exports.deleteLostObject = async (req, res) => {
   }
 };
 
+exports.getLostMatch = async (req, res) => {
+  try {
+    const jsonFilter = req.body;
+    const foundObjects = await FoundObjectModel.find(jsonFilter);
+    if (!foundObjects) {
+      return res.status(404).json({ error: 'No match found' });
+    }
+    res.status(200).json(foundObjects);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
 
 //------------------------------------------------------------------Found Object Functions ---------------------------------------------------------------------
 
