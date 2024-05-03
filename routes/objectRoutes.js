@@ -9,7 +9,7 @@ router.get('/lost-objects', objectController.getAllLostObjects);
 router.get('/lost-objects/:lostObjectId', objectController.getLostObjectById);
 router.put('/lost-objects/:lostObjectId', objectController.updateLostObject);
 router.delete('/lost-objects/:lostObjectId', objectController.deleteLostObject);
-router.get('/match/',objectController.getLostMatch);
+router.post('/match/',objectController.getLostMatch);
 
 
 router.post('/found-objects', objectController.createFoundObject);
