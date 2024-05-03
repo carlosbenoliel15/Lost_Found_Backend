@@ -1,5 +1,10 @@
 const {AuctionModel, BidModel} = require('../models/Auction');
 
+const errorHandler = (res, error) => {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  };
+
 //make bid
 exports.makeBid = async (req, res) => {
     try{
@@ -16,14 +21,17 @@ exports.makeBid = async (req, res) => {
         }
 
         const currentBid = await BidModel.find({auction: auctionId}).sort({value: -1});
-        if (currentBid[0].value >= value){
-            return res.status(400).json({error: "Bid must be higher than current bid"});
-            
+        if (currentBid.length > 0){
+            if (currentBid[0].value >= value){
+                return res.status(400).json({error: "Bid must be higher than current bid"});
+                
+            }            
         }
 
         await bid.save();
         return res.status(200).json(bid);
     } catch (error){
+        //errorHandler(res, error);
         return res.status(400).json({error: "Could not make bid"});
     }
 }

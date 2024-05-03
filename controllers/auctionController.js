@@ -1,6 +1,11 @@
 const {AuctionModel, BidModel} = require('../models/Auction');
 const {UserModel} = require('../models/User');
 
+const errorHandler = (res, error) => {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  };
+
 //create auction
 exports.createAuction = async (req, res) => {
     try{
@@ -14,6 +19,7 @@ exports.createAuction = async (req, res) => {
         await auction.save();
         res.status(200).json(auction);
     } catch (error){
+        //errorHandler(res, error);
         return res.status(400).json({error: "Could not create auction"});
     }
 }
