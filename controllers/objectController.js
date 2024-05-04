@@ -99,6 +99,28 @@ exports.getLostMatch = async (req, res) => {
   }
 };
 
+exports.getLostObjectByUserId = async (req, res) => {
+  try {
+    const userIdToken = req.params.id;
+    const userId = jwtDecode(userIdToken)["userId"];
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const owner = await OwnerModel.findOne({ user: userId });
+    if (!owner) {
+      return res.status(404).json({ error: 'Owner not found' });
+    }
+    const lostObjects = await LostObjectModel.find({ owner: owner._id });
+    if (!lostObjects) {
+      return res.status(404).json({ error: 'LostObjects not found' });
+    }
+    res.status(200).json(lostObjects);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
 
 //------------------------------------------------------------------Found Object Functions ---------------------------------------------------------------------
 

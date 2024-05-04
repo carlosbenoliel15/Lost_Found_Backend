@@ -10,7 +10,7 @@ router.get('/lost-objects/:lostObjectId', objectController.getLostObjectById);
 router.put('/lost-objects/:lostObjectId', objectController.updateLostObject);
 router.delete('/lost-objects/:lostObjectId', objectController.deleteLostObject);
 router.post('/match/',objectController.getLostMatch);
-
+router.get('/lost-objects/user/:id', objectController.getLostObjectByUserId);
 
 router.post('/found-objects', objectController.createFoundObject);
 router.post('/found-objects_registeredUser', objectController.createFoundObject);
