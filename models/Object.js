@@ -10,6 +10,10 @@ const CategoryModel = mongoose.model('Category', CategorySchema);
 const LostObjectSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required:true}, // Reference to Category
+  title: { 
+    type: String,
+    required: true 
+  },
   description: { 
     type: String,
     required: true 
@@ -34,6 +38,10 @@ const FoundObjectSchema = new mongoose.Schema({
   policeOfficerThatReceived: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required: true},
   category: { type:String,required: true},
   //category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required: true},
+  title: { 
+    type: String,
+    required: true 
+  },
   description: { 
     type: String,
     required: true 
