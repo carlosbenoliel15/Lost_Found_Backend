@@ -11,4 +11,7 @@ router.post('/', categoryController.createCategory);
 // Rota para deletar uma categoria
 router.delete('/:name', categoryController.delete);
 
+// Rota para obter uma categoria pelo id
+router.get('/:id', categoryController.getCategoryById);
+
 module.exports = router;

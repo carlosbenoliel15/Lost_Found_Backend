@@ -39,3 +39,16 @@ exports.delete = async (req, res) => {
         return res.status(400).json({error: "Could not delete category"});
     }
 }
+
+//get category by id
+exports.getCategoryById = async (req, res) => {
+    try{
+        const category = await CategoryModel.findById(req.params.id);
+        if (!category){
+            return res.status(400).json({error: "Category not found"});
+        }
+        return res.status(200).json(category);
+    } catch (error){
+        return res.status(400).json({error: "Could not get category"});
+    }
+}
