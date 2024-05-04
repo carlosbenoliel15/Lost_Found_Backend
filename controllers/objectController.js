@@ -1,5 +1,6 @@
 const { LostObjectModel, FoundObjectModel } = require('../models/Object');
-
+const { UserModel, OwnerModel } = require('../models/User');
+const { jwtDecode } = require("jwt-decode");
 
 // Middleware de tratamento de erros
 const errorHandler = (res, error) => {
@@ -13,25 +14,19 @@ exports.createLostObject = async (req, res) => {
     const token = jwtDecode(req.body.owner);
     const ownerId  = token["userId"];
     
-    const newOwnerId = new OwnerModel.findOne({ user: ownerId });
-    const userIdCheck = new UserModel.findById({ user: ownerId});
-    if (newOwnerId) {
-        res.status(404).json({ error: 'Owner already exists' });
+    const newOwnerId = await OwnerModel.findOne({ user: ownerId });
+    const userIdCheck = await UserModel.findById(ownerId);
+    if (!newOwnerId && userIdCheck) {
+      const newOwnerId = new OwnerModel({ user: ownerId });
+      await newOwnerId.save();
+      console.log(newOwnerId);
+      req.body.owner = newOwnerId._id;
     }
-
-    if (!userIdCheck) {
-        res.status(404).json({ error: 'User does not exist' });
+    else if(newOwnerId){
+      req.body.owner = newOwnerId;
     }
-    const newOwner = new OwnerModel({ user: userId });
-    
-    await newOwnerId.save();
-    res.status(200).json(newOwnerId);
-
 
     const newLostObject = new LostObjectModel(req.body);
-    // Try create owner -> get response [owner Id] -> create olst obj
-
-    console.log(token["userId"])
     await newLostObject.save();
     res.status(201).json(newLostObject);
   } catch (error) {
