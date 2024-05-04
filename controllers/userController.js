@@ -233,6 +233,18 @@ exports.getProfileImage = async (req, res) => {
     return res.status(500)
         .json({ error: err });
   };
-}
+};
 
 
+exports.getUser = async (req, res) => {
+  try {
+    const user = await UserModel.findOne(req.body);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(200).json(user);
+  }
+  catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
