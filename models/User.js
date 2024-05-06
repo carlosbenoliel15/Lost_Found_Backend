@@ -17,6 +17,24 @@ const UserSchema = new mongoose.Schema({
   profileImage: String,
 });
 
+// Middleware to format birth date before saving
+UserSchema.pre('save', function(next) {
+  if (this.birth) {
+    // Format birth date to DD-MM-YYYY
+    const formattedBirthDate = formatDate(this.birth);
+    this.birth = formattedBirthDate;
+  }
+  next();
+});
+
+// Function to format date to DD-MM-YYYY
+function formatDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 const UserModel = mongoose.model('User', UserSchema);
 
 // Schema para Bidder
