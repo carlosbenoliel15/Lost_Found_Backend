@@ -28,18 +28,22 @@ exports.createUser = async (req, res) => {
     }
 
     // If there are no users with the same attributes, create a new user
+    if (req.file?.filename) {
+      cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
+            req.body['profileImage'] = result.public_id;
+            const newUser = new UserModel(req.body);
+            await newUser.save();
+            res.status(201).json(newUser);
+          }
+          , error => {
+            res.status(400).json({ error: error.message });
+          });
+    } else {
+        const newUser = new UserModel(req.body);
+        await newUser.save();
+        res.status(201).json(newUser);
+    }
 
-    cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
-              req.body['profileImage'] = result.public_id;
-              const newUser = new UserModel(req.body);
-              console.log(newUser);
-              console.log(newUser._id);
-              await newUser.save();
-              res.status(201).json(newUser);
-            }
-        , error => {
-              res.status(400).json({ error: error.message });
-        });
 
   } catch (error) {
     res.status(400).json({ error: error.message });
