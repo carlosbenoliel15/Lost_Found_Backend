@@ -89,14 +89,11 @@ exports.updateUserById = async (req, res) => {
       return res.status(400).json({ error: 'No changes detected' });
     }
 
-
-
-    // Update the user
     // Update the user
 
     if (req.file?.filename) {
       cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
-            updatedAttributes['profileImage'] = result.public_id;
+            updatedAttributes['profileImage'] = result.public_id.replace('profileImages/', '')
             const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
             if (!updatedUser) {
               return res.status(404).json({ error: 'User not found' });
