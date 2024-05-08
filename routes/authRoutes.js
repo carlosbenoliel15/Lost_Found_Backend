@@ -5,4 +5,7 @@ const authController = require('../controllers/authController');
 // Rota para login
 router.post('/login', authController.login);
 
+// Rota para obter token
+router.get('/token/:token', authController.generateToken);
+
 module.exports = router;
