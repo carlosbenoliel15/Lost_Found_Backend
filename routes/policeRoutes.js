@@ -17,6 +17,7 @@ const {
 
 
 router.post('/police-stations', createPoliceStation);
+router.get('/police-stations', getPoliceStation);
 router.put('/police-stations/:id', updatePoliceStation);
 router.get('/police-stations/:id', getPoliceStationById);
 router.delete('/police-stations/:id', deletePoliceStation);

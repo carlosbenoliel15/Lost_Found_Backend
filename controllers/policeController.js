@@ -13,6 +13,16 @@ exports.createPoliceStation = async (req, res) => {
   }
 };
 
+exports.getPoliceStation = async (req, res) => {
+  try {
+    const policeStations = await PoliceStationModel.find();
+    res.status(200).json(policeStations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 exports.updatePoliceStation = async (req, res) => {
   try {
     const { id } = req.params;
