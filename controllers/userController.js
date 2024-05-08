@@ -27,22 +27,9 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ error: 'NIF is already in use' });
     }
 
-    // If there are no users with the same attributes, create a new user
-    if (req.file?.filename) {
-      cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
-            req.body['profileImage'] = result.public_id;
-            const newUser = new UserModel(req.body);
-            await newUser.save();
-            res.status(201).json(newUser);
-          }
-          , error => {
-            res.status(400).json({ error: error.message });
-          });
-    } else {
-        const newUser = new UserModel(req.body);
-        await newUser.save();
-        res.status(201).json(newUser);
-    }
+    const newUser = new UserModel(req.body);
+    await newUser.save();
+    res.status(201).json(newUser);
 
 
   } catch (error) {
@@ -54,13 +41,14 @@ exports.createUser = async (req, res) => {
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
   try {
+    console.log(req.body)
     const userToken = req.body.token;
     const token = jwtDecode(userToken);
     const currentUser = await UserModel.findById(token["userId"]);
     console.log(currentUser)
 
     const updatedAttributes = req.body;
-    console.log(updatedAttributes)
+
     // Check if there is already a user with the same email, NIC, or NIF
     if (updatedAttributes.email) {
       const existingEmailUser = await UserModel.findOne({ email: updatedAttributes.email, _id: { $ne: currentUser._id } });
@@ -101,13 +89,33 @@ exports.updateUserById = async (req, res) => {
       return res.status(400).json({ error: 'No changes detected' });
     }
 
+
+
     // Update the user
-    const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+    // Update the user
+
+    if (req.file?.filename) {
+      cloudinaryService.uploadImage(req.file.filename, 'profileImages').then( async result => {
+            updatedAttributes['profileImage'] = result.public_id;
+            const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
+            if (!updatedUser) {
+              return res.status(404).json({ error: 'User not found' });
+            }
+
+            res.status(200).json(updatedUser);
+          }
+          , error => {
+            res.status(400).json({ error: error.message });
+          });
+    } else {
+      const updatedUser = await UserModel.findByIdAndUpdate(token["userId"], updatedAttributes, { new: true });
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.status(200).json(updatedUser);
     }
 
-    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
