@@ -10,7 +10,7 @@ const upload = multer({ dest: 'uploads/' })
 
 // User Routes
 router.post('/signup/',upload.single('profileImage'), userController.createUser);
-router.put('/update/', userController.updateUserById);
+router.put('/update/',upload.single('profileImage'), userController.updateUserById);
 router.put('/updatePass/', userController.updatePassById);  
 router.delete('/delete/:token', userController.deleteUserById);
 router.get('/profile/:token',userController.getUserInfo);
