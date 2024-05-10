@@ -15,9 +15,8 @@ const UserSchema = new mongoose.Schema({
   nif: { type: String, unique: true },
   gender: String,
   profileImage: String,
+  role: { type: String, enum: ["User","Police","Admin"] ,required: true },
 });
-
-
 
 const UserModel = mongoose.model('User', UserSchema);
 
@@ -35,4 +34,14 @@ const OwnerSchema = new mongoose.Schema({
 
 const OwnerModel = mongoose.model('Owner', OwnerSchema);
 
-module.exports = { UserModel, BidderModel, OwnerModel };
+// Schema para PoliceOfficer
+const PoliceOfficerSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true },
+  police_id: { type: String, unique: true },
+  station: {type: mongoose.Schema.Types.ObjectId,ref: 'PoliceStation'}
+});
+
+// Model para PoliceStation
+const PoliceOfficerModel = mongoose.model('PoliceOfficer', PoliceOfficerSchema);
+
+module.exports = { UserModel, BidderModel, OwnerModel, PoliceOfficerModel };
