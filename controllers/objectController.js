@@ -204,12 +204,178 @@ exports.deleteLostObject = async (req, res) => {
 //*
 exports.getLostMatch = async (req, res) => {
   try {
-    const jsonFilter = req.body;
-    const foundObjects = await FoundObjectModel.find(jsonFilter);
-    if (!foundObjects) {
-      return res.status(404).json({ error: 'No match found' });
+
+    //get the lost object information
+    const lostJsonObject = {};
+    const lostObject = await LostObjectModel.findById(req.body.lostObjectId);
+    if (!lostObject) {
+      return res.status(404).json({ error: 'LostObject not found' });
     }
-    res.status(200).json(foundObjects);
+    const categoryName = await CategoryModel.findById(lostObject.category);
+    lostJsonObject.object_id = lostObject._id;
+    lostJsonObject.owner = lostObject.owner;
+    lostJsonObject.title = lostObject.title;
+    lostJsonObject.description = lostObject.description;
+    lostJsonObject.location = lostObject.location;
+    lostJsonObject.price = lostObject.price;
+    lostJsonObject.lostDate = lostObject.lostDate;
+    lostJsonObject.status = lostObject.status;
+    lostJsonObject.objectImage = lostObject.objectImage;
+    lostJsonObject.category_id = categoryName._id;
+    lostJsonObject.category = categoryName.name;
+
+    const subCategories = await ObjSubCategoryModel.find({ object: req.body.lostObjectId });
+    const subCategoriesArray = [];
+
+    for (const item of subCategories) {
+      const subCategoryJson = {};
+      const subCategory = await SubCategoryModel.findById(item.subCategory);
+      subCategoryJson.objSubCategory_id = item._id;
+      subCategoryJson.subCategory_id = subCategory._id;
+      subCategoryJson.subCategory = subCategory.name;
+      subCategoryJson.description = item.description;
+      subCategoriesArray.push(subCategoryJson);
+    }
+    lostJsonObject.subCategories = subCategoriesArray;
+
+    //get the found object information
+    const foundObjects = await FoundObjectModel.find();
+    if (!foundObjects) {
+      return res.status(404).json({ error: 'FoundObjects not found' });
+    }
+    const foundArray = [];
+    for (const item of foundObjects) {
+      const foundJson = {};
+      const categoryName = await CategoryModel.findById(item.category);
+      foundJson.object_id = item._id;
+      foundJson.userWhoFound = item.userWhoFound;
+      foundJson.policeOfficerThatReceived = item.policeOfficerThatReceived;
+      foundJson.title = item.title;
+      foundJson.description = item.description;
+      foundJson.location = item.location;
+      foundJson.price = item.price;
+      foundJson.foundDate = item.foundDate;
+      foundJson.endDate = item.endDate;
+      foundJson.status = item.status;
+      foundJson.objectImage = item.objectImage;
+      foundJson.category_id = categoryName._id;
+      foundJson.category = categoryName.name;
+
+      const subCategoriesFound = await ObjSubCategoryModel.find({ object: item._id });
+      const subCategoriesArrayFound = [];
+      for (const item2 of subCategoriesFound) {
+        const subCategoryJson2 = {};
+        const subCategory = await SubCategoryModel.findById(item2.subCategory);
+        subCategoryJson2.objSubCategory_id = item2._id;
+        subCategoryJson2.subCategory_id = subCategory._id;
+        subCategoryJson2.subCategory = subCategory.name;
+        subCategoryJson2.description = item2.description;
+        subCategoriesArrayFound.push(subCategoryJson2);
+      }
+      foundJson.subCategories = subCategoriesArrayFound;
+      foundArray.push(foundJson);
+    }
+
+    //copy the found array to another result array
+    const resultArray = [];
+
+    //compare the lost object with the found objects
+    //Define the weights for each field
+    const categoryWeight = 40;
+    const titleWeight = 20;
+    const descriptionWeight = 13;
+    const locationWeight = 12;
+    const subCategoryWeight = 10;
+    const priceWeight = 5;
+
+    //Analyse the fields
+    for (var i=0; i<foundArray.length; i++){
+      //compare the category
+      var categorySimilarity = 0; 
+      if (lostJsonObject.category === foundArray[i].category){
+        categorySimilarity = categoryWeight;
+      }
+
+      //compare the title
+      const responseTitle = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", { 
+        params: {
+          text1: lostJsonObject.title,
+          text2: foundArray[i].title,
+          lang: "en",
+          token: DANDILION_API,
+          bow: "always" 
+        }
+      });
+      const titleSimilarity = responseTitle.data.similarity * titleWeight;
+
+      //compare the description
+      const responseDesc = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", { 
+        params: {
+          text1: lostJsonObject.description,
+          text2: foundArray[i].description,
+          lang: "en",
+          token: DANDILION_API,
+          bow: "always" 
+        }
+      });
+      const descriptionSimilarity = responseDesc.data.similarity * descriptionWeight;
+
+      //compare the location
+      var locationSimilarity = 0;
+      if (lostJsonObject.location === foundArray[i].location){
+        locationSimilarity = locationWeight;
+      }
+
+      //compare the subcategories
+      const subCategoriesLost = lostJsonObject.subCategories;
+      const subCategoriesFound = foundArray[i].subCategories;
+      var subCategoryEqualNumber = 0;
+      var subCategorySimilarity = 0;
+      for (var j=0; j<subCategoriesLost.length; j++){
+        if (subCategoriesLost[j].subCategory === subCategoriesFound[j].subCategory){
+          subCategoryEqualNumber++;
+          const responseSubCategory = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", {
+            params: {
+              text1: subCategoriesLost[j].description,
+              text2: subCategoriesFound[j].description,
+              lang: "en",
+              token: DANDILION_API,
+              bow: "always"
+            }
+          });
+          subCategorySimilarity += responseSubCategory.data.similarity;
+        }
+      }
+      subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
+
+      //compare the price
+      var priceSimilarity = 0;
+      const p1 = lostJsonObject.price;
+      const p2 = foundArray[i].price;
+      const maxPrice = Math.max(p1, p2);
+      priceSimilarity = (1/(1+(10*(Math.abs(p1-p2))/maxPrice)))*priceWeight;
+      
+
+      //calculate the total similarity
+      const totalSimilarity = ((categorySimilarity + titleSimilarity + descriptionSimilarity + locationSimilarity + subCategorySimilarity + priceSimilarity)/(categoryWeight +titleWeight + descriptionWeight + locationWeight + subCategoryWeight + priceWeight)) * 100;
+      foundArray[i].similarity = totalSimilarity;
+
+      //reject the found objects that have a similarity less than 1%
+      if (totalSimilarity >= 0.01){
+        resultArray.push(foundArray[i]);
+      }
+      console.log("=====================================================================================================");
+      console.log("The similarity between the lost object and the found object is: " + totalSimilarity);
+      console.log("The found object is: " + foundArray[i].object_id);
+      console.log("Category similarity: " + categorySimilarity);
+      console.log("Title similarity: " + titleSimilarity);
+      console.log("Description similarity: " + descriptionSimilarity);
+      console.log("SubCategory similarity: " + subCategorySimilarity);
+      console.log("Price similarity: " + priceSimilarity);
+
+    }
+    
+    res.status(200).json(resultArray);
   } catch (error) {
     errorHandler(res, error);
   }
