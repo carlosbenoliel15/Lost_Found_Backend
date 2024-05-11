@@ -63,13 +63,13 @@ exports.createLostObject = async (req, res) => {
     for (const key in subCategory) {
       const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: category._id });
       if (!subCategoryCheck) {
-        return res.status(404).json({ error: 'SubCategory: ' + subCategory[i] + ' not found' });
+        return res.status(404).json({ error: 'SubCategory: ' + subCategory[key].name + ' not found' });
       }
 
       const subCategoryArgs = {
         object: newLostObjectFiltered._id,
         subCategory: subCategoryCheck._id,
-        description: req.body.description
+        description: subCategory[key].description
       };
       const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
       await subCategoryFiltered.save();
