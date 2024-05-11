@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const objectController = require('../controllers/objectController');
 
-//---------------------------- Los Objects  Route -----------------------------------
+//---------------------------- Test  Route -----------------------------------
+router.get('/test', objectController.test);
+
+//---------------------------- Lost Objects  Route -----------------------------------
 
 router.post('/lost-objects', objectController.createLostObject);
 router.get('/lost-objects', objectController.getAllLostObjects);
