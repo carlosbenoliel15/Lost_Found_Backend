@@ -20,8 +20,29 @@ const authService = {
       // Gere um token JWT para o usuário
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
     
-      return token;
-    } catch (error) {
+// Construa o objeto contendo o token e as informações do usuário
+      const userData = {
+        token,
+        user: {
+          
+          first_name: user.first_name,
+          last_name: user.last_name,
+          email: user.email,
+          address: user.address,
+          profile_photo: user.profile_photo,
+          phone: user.phone,
+          birth: user.birth,
+          status: user.status,
+          nic: user.nic,
+          nif: user.nif,
+          gender: user.gender,
+          profileImage: user.profileImage,
+          role: user.role
+        }
+      };
+
+return userData;   
+ } catch (error) {
       throw error;
     }
   }
