@@ -15,6 +15,7 @@ exports.generateToken = async (req, res) => {
   try {
     const { token } = req.params;
     const info = jwtDecode(token);
+    
     res.json(info);
   } catch (error) {
     res.status(400).json({ error: error.message });
