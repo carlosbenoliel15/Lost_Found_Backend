@@ -16,6 +16,7 @@ const UserSchema = new mongoose.Schema({
   gender: String,
   profileImage: String,
   role: { type: String, enum: ["User","Police","Admin"] ,required: true },
+  googleId: String,
 });
 
 const UserModel = mongoose.model('User', UserSchema);
