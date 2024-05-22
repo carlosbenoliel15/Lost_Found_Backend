@@ -28,6 +28,7 @@ const policeRoutes=require('././routes/policeRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const objectRoutes = require('./routes/objectRoutes'); 
+const statsRoutes = require('./routes/statsRoutes'); 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -35,7 +36,7 @@ app.use('/api/police',policeRoutes)
 app.use('/api/auction', auctionRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/', objectRoutes);
-
+app.use('/api/', statsRoutes);
 // Middleware de tratamento de erros
 app.use(require('./middleware/errorMiddleware'));
 
