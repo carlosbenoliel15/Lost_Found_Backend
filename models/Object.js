@@ -4,28 +4,38 @@ const mongoose = require('mongoose');
 const CategorySchema = new mongoose.Schema({
   name: { type: String, unique: true }
 });
-
 const CategoryModel = mongoose.model('Category', CategorySchema);
+
+// Schema for subsubcategory
+const SubSubCategorySchema = new mongoose.Schema({
+  name: { type: String, unique: true}
+})
+const SubSubCategoryModel = mongoose.model('SubSubCategory', SubSubCategorySchema)
 
 // Schema for SubCategory
 const SubCategorySchema = new mongoose.Schema({
   name: { type: String },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required:true}
 });
-
 const SubCategoryModel = mongoose.model('SubCategory', SubCategorySchema);
+
+// Schema for association between sub and subsubcategory
+const SubSubCategoryAssociationSchema = new mongoose.Schema({
+  subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory', required: true},
+  subSubCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubCategory', required: true}
+});
+const SubSubCategoryAssociationModel = mongoose.model('SubSubCategoryAssociation', SubSubCategoryAssociationSchema);
 
 const ObjSubCategorySchema =  new mongoose.Schema({
   object: { type: mongoose.Schema.Types.ObjectId, required: true},
   subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory', required:true},
-  description: { type: String, required: true}
+  subSubCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubCategory', required:true}
 });
-
 const ObjSubCategoryModel = mongoose.model('ObjSubCategory', ObjSubCategorySchema);
 
 const LostObjectSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User',required:true },
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required:true}, // Reference to Category
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category',required:true},
   title: { type: String, required: true },
   description: { type: String, required: true },
   location: { type: String, required: true },
@@ -34,7 +44,6 @@ const LostObjectSchema = new mongoose.Schema({
   status: { type: String, enum: ['Lost', 'Claimed'], default: 'Lost' },
   objectImage: String,
 });
-
 const LostObjectModel = mongoose.model('LostObject', LostObjectSchema);
 
 // Schema for FoundObject
@@ -52,7 +61,6 @@ const FoundObjectSchema = new mongoose.Schema({
   endDate: String,
   objectImage: String,
 });
-
 const FoundObjectModel = mongoose.model('FoundObject', FoundObjectSchema);
 
-module.exports = { LostObjectModel, FoundObjectModel, CategoryModel, SubCategoryModel, ObjSubCategoryModel};
+module.exports = { LostObjectModel, FoundObjectModel, CategoryModel, SubCategoryModel, ObjSubCategoryModel, SubSubCategoryModel, SubSubCategoryAssociationModel};

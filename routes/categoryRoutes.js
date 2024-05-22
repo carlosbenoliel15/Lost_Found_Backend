@@ -22,5 +22,14 @@ router.get('/subCat/:categoryName/:subCategoryId', categoryController.getSubCate
 // Rota para listar todas as subcategorias de uma categoria
 router.get('/subCat/:categoryName', categoryController.listAllSubCategories);
 
+//============================Sub Sub Categories================================
+// Rotas para criar uma sub sub categoria
+router.post('/subSubCat/:categoryName/:subCategoryName', categoryController.createSubSubCategory);
+// Rota para listar todas as sub sub categorias de uma sub categoria
+router.get('/subSubCat/:categoryName/:subCategoryName', categoryController.listAllSubSubCategories);
+// Rota para deletar uma sub sub categoria
+router.delete('/subSubCat/:categoryName/:subCategoryName/:subSubCategoryName', categoryController.deleteSubSubCategory);
+// Rota para obter uma sub sub categoria pelo id
+router.get('/subSubCat/:categoryName/:subCategoryName/:subSubCategoryName', categoryController.getSubSubCategoryById);
 
 module.exports = router;

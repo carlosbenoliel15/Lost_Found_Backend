@@ -1,8 +1,9 @@
-const { LostObjectModel, FoundObjectModel, CategoryModel, ObjSubCategoryModel, SubCategoryModel } = require('../models/Object');
+const { LostObjectModel, FoundObjectModel, CategoryModel, ObjSubCategoryModel, SubCategoryModel, SubSubCategoryModel, SubSubCategoryAssociationModel} = require('../models/Object');
 const { UserModel, OwnerModel, PoliceOfficerModel } = require('../models/User');
 const { jwtDecode } = require("jwt-decode");
 const axios = require('axios');
 const DANDILION_API = process.env.DANDILION_API_KEY;
+const ObjectId = require('mongoose').Types.ObjectId;
 
 // Middleware de tratamento de erros
 const errorHandler = (res, error) => {
@@ -61,15 +62,25 @@ exports.createLostObject = async (req, res) => {
     const newLostObjectFiltered = new LostObjectModel(newLostObjectArgs);
 
     for (const key in subCategory) {
-      const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: category._id });
+      const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
       if (!subCategoryCheck) {
         return res.status(404).json({ error: 'SubCategory: ' + subCategory[key].name + ' not found' });
+      }
+
+      const subSubCategoryCheck = await SubSubCategoryModel.findOne({ name: subCategory[key].subSubCategory});
+      if (!subSubCategoryCheck) {
+        return res.status(404).json({ error: 'SubSubCategory: ' + subCategory[key].subCategory + ' not found' });
+      }
+
+      const subSubCategoryAssociationCheck = await SubSubCategoryAssociationModel.findOne({ subCategory: new ObjectId(subCategoryCheck._id), subSubCategory: new ObjectId(subSubCategoryCheck._id) });
+      if (!subSubCategoryAssociationCheck) {
+        return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and SubSubCategory ' + subCategory[key].subCategory + ' not associated'});
       }
 
       const subCategoryArgs = {
         object: newLostObjectFiltered._id,
         subCategory: subCategoryCheck._id,
-        description: subCategory[key].description
+        subSubCategory: subSubCategoryCheck._id
       };
       const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
       await subCategoryFiltered.save();
@@ -114,7 +125,9 @@ exports.getAllLostObjects = async (req, res) => {
         subCategoryJson.objSubCategory_id = item._id;
         subCategoryJson.subCategory_id = subCategory._id;
         subCategoryJson.subCategory = subCategory.name;
-        subCategoryJson.description = item.description;
+        subCategoryJson.subSubCategories = item.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
         subCategoriesArray.push(subCategoryJson);
       }
       resJson.subCategories = subCategoriesArray;
@@ -156,7 +169,10 @@ exports.getLostObjectById = async (req, res) => {
       subCategoryJson.objSubCategory_id = item._id;
       subCategoryJson.subCategory_id = subCategory._id;
       subCategoryJson.subCategory = subCategory.name;
-      subCategoryJson.description = item.description;
+      subCategoryJson.subSubCategories = item.subSubCategory;
+      const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+      subCategoryJson.subSubCategoryName = subSubCategory.name;
+
       subCategoriesArray.push(subCategoryJson);
     }
     resJson.subCategories = subCategoriesArray;
@@ -201,7 +217,7 @@ exports.deleteLostObject = async (req, res) => {
   }
 };
 
-//*
+// Match 
 exports.getLostMatch = async (req, res) => {
   try {
 
@@ -233,7 +249,9 @@ exports.getLostMatch = async (req, res) => {
       subCategoryJson.objSubCategory_id = item._id;
       subCategoryJson.subCategory_id = subCategory._id;
       subCategoryJson.subCategory = subCategory.name;
-      subCategoryJson.description = item.description;
+      subCategoryJson.subSubCategories = item.subSubCategory;
+      const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+      subCategoryJson.subSubCategoryName = subSubCategory.name;
       subCategoriesArray.push(subCategoryJson);
     }
     lostJsonObject.subCategories = subCategoriesArray;
@@ -269,13 +287,14 @@ exports.getLostMatch = async (req, res) => {
         subCategoryJson2.objSubCategory_id = item2._id;
         subCategoryJson2.subCategory_id = subCategory._id;
         subCategoryJson2.subCategory = subCategory.name;
-        subCategoryJson2.description = item2.description;
+        subCategoryJson2.subSubCategories = item2.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item2.subSubCategory);
+        subCategoryJson2.subSubCategoryName = subSubCategory.name;
         subCategoriesArrayFound.push(subCategoryJson2);
       }
       foundJson.subCategories = subCategoriesArrayFound;
       foundArray.push(foundJson);
     }
-
     //copy the found array to another result array
     const resultArray = [];
 
@@ -334,16 +353,11 @@ exports.getLostMatch = async (req, res) => {
       for (var j=0; j<subCategoriesLost.length; j++){
         if (subCategoriesLost[j].subCategory === subCategoriesFound[j].subCategory){
           subCategoryEqualNumber++;
-          const responseSubCategory = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", {
-            params: {
-              text1: subCategoriesLost[j].description,
-              text2: subCategoriesFound[j].description,
-              lang: "en",
-              token: DANDILION_API,
-              bow: "always"
-            }
-          });
-          subCategorySimilarity += responseSubCategory.data.similarity;
+          var subSimilarity = 0;
+          if (subCategoriesLost[j].subSubCategoryName.toLowerCase() === subCategoriesFound[j].subSubCategoryName.toLowerCase()){
+            subSimilarity = 1;
+          }
+          subCategorySimilarity += subSimilarity;
         }
       }
       subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
@@ -381,6 +395,7 @@ exports.getLostMatch = async (req, res) => {
   }
 };
 
+// Get LostObjects by User ID
 exports.getLostObjectByUserId = async (req, res) => {
   try {
     const resJson = {};
@@ -394,8 +409,8 @@ exports.getLostObjectByUserId = async (req, res) => {
     if (!owner) {
       return res.status(404).json({ error: 'Owner not found' });
     }
-    const lostObjects = await LostObjectModel.find({ owner: owner._id });
-    if (!lostObjects) {
+    const lostObject = await LostObjectModel.find({ owner: owner._id });
+    if (!lostObject) {
       return res.status(404).json({ error: 'LostObjects not found' });
     }
 
@@ -420,7 +435,9 @@ exports.getLostObjectByUserId = async (req, res) => {
       subCategoryJson.objSubCategory_id = item._id;
       subCategoryJson.subCategory_id = subCategory._id;
       subCategoryJson.subCategory = subCategory.name;
-      subCategoryJson.description = item.description;
+      subCategoryJson.subSubCategories = item.subSubCategory;
+      const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+      subCategoryJson.subSubCategoryName = subSubCategory.name;
       subCategoriesArray.push(subCategoryJson);
     }
     resJson.subCategories = subCategoriesArray;
@@ -485,15 +502,25 @@ exports.createFoundObject = async (req, res) => {
     const subCategory = req.body.subCategory;
     const newFoundObject = new FoundObjectModel(newFoundObjectData);
     for (const key in subCategory) {
-      const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: category._id });
+      const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
       if (!subCategoryCheck) {
-        return res.status(404).json({ error: 'SubCategory: ' + subCategory[i] + ' not found' });
+        return res.status(404).json({ error: 'SubCategory: ' + subCategory[key].name + ' not found' });
+      }
+
+      const subSubCategoryCheck = await SubSubCategoryModel.findOne({ name: subCategory[key].subSubCategory});
+      if (!subSubCategoryCheck) {
+        return res.status(404).json({ error: 'SubSubCategory: ' + subCategory[key].subCategory + ' not found' });
+      }
+
+      const subSubCategoryAssociationCheck = await SubSubCategoryAssociationModel.findOne({ subCategory: new ObjectId(subCategoryCheck._id), subSubCategory: new ObjectId(subSubCategoryCheck._id) });
+      if (!subSubCategoryAssociationCheck) {
+        return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and SubSubCategory ' + subCategory[key].subCategory + ' not associated'});
       }
 
       const subCategoryArgs = {
         object: newFoundObject._id,
         subCategory: subCategoryCheck._id,
-        description: req.body.description
+        subSubCategory: subSubCategoryCheck._id
       };
       const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
       await subCategoryFiltered.save();
@@ -539,7 +566,9 @@ exports.getAllFoundObjects = async (req, res) => {
         subCategoryJson.objSubCategory_id = item._id;
         subCategoryJson.subCategory_id = subCategory._id;
         subCategoryJson.subCategory = subCategory.name;
-        subCategoryJson.description = item.description;
+        subCategoryJson.subSubCategories = item.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
         subCategoriesArray.push(subCategoryJson);
       }
       resJson.subCategories = subCategoriesArray;
@@ -584,7 +613,9 @@ exports.getFoundObjectById = async (req, res) => {
       subCategoryJson.objSubCategory_id = item._id;
       subCategoryJson.subCategory_id = subCategory._id;
       subCategoryJson.subCategory = subCategory.name;
-      subCategoryJson.description = item.description;
+      subCategoryJson.subSubCategories = item.subSubCategory;
+      const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+      subCategoryJson.subSubCategoryName = subSubCategory.name;
       subCategoriesArray.push(subCategoryJson);
     }
     resJson.subCategories = subCategoriesArray;    
