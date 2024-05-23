@@ -101,16 +101,16 @@ exports.getSubCategoryById = async (req, res) => {
         if (!category){
             return res.status(400).json({error: "Category not found"});
         }
+
         const subCategory = await SubCategoryModel.findById(req.params.subCategoryId);
         if (!subCategory){
             return res.status(400).json({error: "Subcategory not found"});
         }
-
+1
         const ObjectId = require('mongoose').Types.ObjectId;
         const subSubCategories = await SubSubCategoryAssociationModel.find({subCategory: new ObjectId(subCategory._id)});
         var subSubCategoriesJson = [];
-        for (let i = 0; i < subSubCategories.length; i++){
-            
+        for (let i = 0; i < subSubCategories.length; i++){           
             const subSubCategory = await SubSubCategoryModel.findById(subSubCategories[i].subSubCategory);
             subSubCategoriesJson.push({
                 _id: subSubCategory._id,
@@ -119,10 +119,8 @@ exports.getSubCategoryById = async (req, res) => {
         }
 
         const combinedData = {
-            category: category._id,
-            category_name: category.name,
-            subcategory: subCategory._id,
-            subcategory_name: subCategory.name,
+            category: category,
+            subcategory: subCategory,
             subSubCategories: subSubCategoriesJson
         };
         return res.status(200).json(combinedData);
@@ -157,10 +155,8 @@ exports.listAllSubCategories = async (req, res) => {
                     name: subSubCategory.name
                 });
             }
-            infoJson.category = category._id;
-            infoJson.category_name = category.name;
-            infoJson.subcategory = subCategories[i]._id;
-            infoJson.subcategory_name = subCategories[i].name;
+            infoJson.category = category;
+            infoJson.subcategory = subCategories[i];
             infoJson.subSubCategories = subSubCategoriesJson;
             resArray.push(infoJson);
         }
