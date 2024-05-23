@@ -113,8 +113,8 @@ exports.getSubCategoryById = async (req, res) => {
             
             const subSubCategory = await SubSubCategoryModel.findById(subSubCategories[i].subSubCategory);
             subSubCategoriesJson.push({
-                subSubCategory: subSubCategory._id,
-                subSubCategory_name: subSubCategory.name
+                _id: subSubCategory._id,
+                name: subSubCategory.name
             });
         }
 
@@ -153,8 +153,8 @@ exports.listAllSubCategories = async (req, res) => {
             for (let i = 0; i < subSubCategories.length; i++){       
                 const subSubCategory = await SubSubCategoryModel.findById(subSubCategories[i].subSubCategory);
                 subSubCategoriesJson.push({
-                    subSubCategory: subSubCategory._id,
-                    subSubCategory_name: subSubCategory.name
+                    _id: subSubCategory._id,
+                    name: subSubCategory.name
                 });
             }
             infoJson.category = category._id;
@@ -259,8 +259,8 @@ exports.getSubSubCategoryById = async (req, res) => {
             category_name: category.name,
             subcategory: subCategory._id,
             subcategory_name: subCategory.name,
-            subsubcategory: subSubCategory._id,
-            subsubcategory_name: subSubCategory.name
+            _id: subSubCategory._id,
+            name: subSubCategory.name
         };
         return res.status(200).json(combinedData);
     } catch (error){
@@ -293,8 +293,8 @@ exports.listAllSubSubCategories = async (req, res) => {
                 category_name: category.name,
                 subCategory: subCategory._id,
                 subCategory_name: subCategory.name,
-                subSubCategory: subSubCategory._id,
-                subSubCategory_name: subSubCategory.name
+                _id: subSubCategory._id,
+                name: subSubCategory.name
             });
         }
         return res.status(200).json(resJson);
