@@ -251,10 +251,8 @@ exports.getSubSubCategoryById = async (req, res) => {
             return res.status(400).json({error: "Subsubcategory not found"});
         }
         const combinedData = {
-            category: category._id,
-            category_name: category.name,
-            subcategory: subCategory._id,
-            subcategory_name: subCategory.name,
+            category: category,
+            subcategory: subCategory,
             _id: subSubCategory._id,
             name: subSubCategory.name
         };
@@ -285,10 +283,8 @@ exports.listAllSubSubCategories = async (req, res) => {
         for (let i = 0; i < subSubCategories.length; i++){
             const subSubCategory = await SubSubCategoryModel.findById(subSubCategories[i].subSubCategory);
             resJson.push({
-                category: category._id,
-                category_name: category.name,
-                subCategory: subCategory._id,
-                subCategory_name: subCategory.name,
+                category: category,
+                subCategory: subCategory,
                 _id: subSubCategory._id,
                 name: subSubCategory.name
             });
