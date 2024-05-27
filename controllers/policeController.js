@@ -159,3 +159,21 @@ exports.deletePoliceOfficer = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.getPoliceOfficerByUserId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const policeOfficer = await PoliceOfficerModel.findOne({ user: id });
+    if (!policeOfficer) {
+      return res.status(404).json({ error: 'Police officer not found' });
+    }
+    res.status(200).json(policeOfficer);
+  }
+  catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}

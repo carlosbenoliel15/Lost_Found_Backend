@@ -9,7 +9,8 @@ const {
   createPoliceOfficer,
   updatePoliceOfficer,
   getPoliceOfficerById,
-  deletePoliceOfficer
+  deletePoliceOfficer,
+  getPoliceOfficerByUserId
 } = require('../controllers/policeController');
 
 
@@ -23,5 +24,6 @@ router.post('/police-officers', createPoliceOfficer);
 router.put('/police-officers/:id', updatePoliceOfficer);
 router.get('/police-officers/:id', getPoliceOfficerById);
 router.delete('/police-officers/:id', deletePoliceOfficer);
+router.get('/police-officers/users/:id', getPoliceOfficerByUserId);
 
 module.exports = router;
