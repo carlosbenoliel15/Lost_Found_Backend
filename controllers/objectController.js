@@ -398,7 +398,6 @@ exports.getLostMatch = async (req, res) => {
 // Get LostObjects by User ID
 exports.getLostObjectByUserId = async (req, res) => {
   try {
-    const resJson = {};
     const userIdToken = req.params.id;
     const userId = jwtDecode(userIdToken)["userId"];
     const user = await UserModel.findById(userId);
@@ -409,40 +408,46 @@ exports.getLostObjectByUserId = async (req, res) => {
     if (!owner) {
       return res.status(404).json({ error: 'Owner not found' });
     }
-    const lostObject = await LostObjectModel.find({ owner: owner._id });
+    
+    const lostObject = await LostObjectModel.find({ owner:  owner._id });
     if (!lostObject) {
       return res.status(404).json({ error: 'LostObjects not found' });
     }
+    
+    const resArray = [];
+    for (const item of lostObject) {
+      const resJson = {};
+      const categoryName = await CategoryModel.findById(item.category);
 
-    const categoryName = await CategoryModel.findById(lostObject.category);
-    resJson.object_id = lostObject._id;
-    resJson.owner = lostObject.owner;
-    resJson.title = lostObject.title;
-    resJson.description = lostObject.description;
-    resJson.location = lostObject.location;
-    resJson.price = lostObject.price;
-    resJson.lostDate = lostObject.lostDate;
-    resJson.status = lostObject.status;
-    resJson.objectImage = lostObject.objectImage;
-    resJson.category_id = categoryName._id;
-    resJson.category = categoryName.name;
+      resJson.object_id = item._id;
+      resJson.owner = item.owner;
+      resJson.title = item.title;
+      resJson.description = item.description;
+      resJson.location = item.location;
+      resJson.price = item.price;
+      resJson.lostDate = item.lostDate;
+      resJson.status = item.status;
+      resJson.objectImage = item.objectImage;
+      resJson.category_id = categoryName._id;
+      resJson.category = categoryName.name;
 
-    const subCategories = await ObjSubCategoryModel.find({ object: lostObjectId });
-    const subCategoriesArray = [];
-    for (const item of subCategories) {
-      const subCategoryJson = {};
-      const subCategory = await SubCategoryModel.findById(item.subCategory);
-      subCategoryJson.objSubCategory_id = item._id;
-      subCategoryJson.subCategory_id = subCategory._id;
-      subCategoryJson.subCategory = subCategory.name;
-      subCategoryJson.subSubCategories = item.subSubCategory;
-      const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
-      subCategoryJson.subSubCategoryName = subSubCategory.name;
-      subCategoriesArray.push(subCategoryJson);
+      const subCategories = await ObjSubCategoryModel.find({ object: item._id });
+      const subCategoriesArray = [];
+      for (const item1 of subCategories) {
+        const subCategoryJson = {};
+        const subCategory = await SubCategoryModel.findById(item1.subCategory);
+        subCategoryJson.subCategory_id = subCategory._id;
+        subCategoryJson.subCategory = subCategory.name;
+        subCategoryJson.subSubCategory_id = item1.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item1.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
+        subCategoriesArray.push(subCategoryJson);
+      }
+      resJson.subCategories = subCategoriesArray;
+      resArray.push(resJson);
     }
-    resJson.subCategories = subCategoriesArray;
 
-    res.status(200).json(resJson);
+    res.status(200).json(resArray);
   } catch (error) {
     errorHandler(res, error);
   }
