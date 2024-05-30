@@ -24,7 +24,7 @@ exports.createAuction = async (req, res) => {
     }
 }
 
-//get all auctions
+//*get all auctions
 exports.getAllAuctions = async (req, res) => {
     try{
         const auctions = await AuctionModel.find();
@@ -37,7 +37,7 @@ exports.getAllAuctions = async (req, res) => {
     }
 }
 
-//get auction by id
+//*get auction by id
 exports.getAuctionById = async (req, res) => {
     try{
         const auction = await AuctionModel.findById(req.params.id);
@@ -50,7 +50,7 @@ exports.getAuctionById = async (req, res) => {
     }
 }
 
-//update auction by id
+//*update auction by id
 exports.updateAuctionById = async (req, res) => {
     try{
         const auction = await AuctionModel.findOne(req.params.id);
@@ -73,7 +73,7 @@ exports.updateAuctionById = async (req, res) => {
     }
 }
 
-//delete auction by id
+//*delete auction by id
 exports.deleteAuctionById = async (req, res) => {
     try{
         const auction = await AuctionModel.findById(req.params.id);
@@ -87,7 +87,7 @@ exports.deleteAuctionById = async (req, res) => {
     }
 }
 
-//get all auctions by user id
+//*get all auctions by user id
 exports.getAllAuctionsByUserId = async (req, res) => {
     try{
         const user = await UserModel.findById(req.params.userid);

@@ -1,4 +1,5 @@
 const {AuctionModel, BidModel} = require('../models/Auction');
+const {BidderModel} = require('../models/User');
 
 const errorHandler = (res, error) => {
     console.error('Error:', error);
@@ -9,10 +10,18 @@ const errorHandler = (res, error) => {
 exports.makeBid = async (req, res) => {
     try{
         const auction = await AuctionModel.findById(req.params.id);
+        
+        const bidder = await BidderModel.findById(req.body.bidder);
+        if (!bidder){
+            const bidder = new BidderModel(req.body.bidder);
+            await bidder.save();
+            req.body.bidder = bidder._id;    
+        }
+
         const bid = new BidModel(req.body);
-        auctionId = bid.auction;
-        bidderId = bid.bidder;
-        value = bid.value;
+        var auctionId = bid.auction;
+        var bidderId = bid.bidder;
+        var value = bid.value;
 
         if (!auction){
             return res.status(400).json({error: "Auction not found"});

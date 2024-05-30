@@ -13,7 +13,6 @@ const {
   getPoliceOfficerByUserId
 } = require('../controllers/policeController');
 
-
 router.post('/police-stations', createPoliceStation);
 router.get('/police-stations', getPoliceStation);
 router.put('/police-stations/:id', updatePoliceStation);
