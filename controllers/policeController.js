@@ -98,8 +98,8 @@ exports.createPoliceOfficer = async (req, res) => {
 
 exports.updatePoliceOfficer = async (req, res) => {
   try {
-    const { police_id } = req.params;
-    const policeOfficer = await PoliceOfficerModel.findOne(police_id);
+    const { id } = req.params;
+    const policeOfficer = await PoliceOfficerModel.findById(id);
     if (!policeOfficer) {
       return res.status(404).json({ error: 'Police officer not found' });
     }

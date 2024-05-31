@@ -33,12 +33,5 @@ router.get('/bidder/:bidderId/auctions', bidderController.getAuctionsByBidder);
 router.get('/bidder/:bidderId/won-auctions', bidderController.getWonAuctionsByBidder);
 router.get('/bidder/:bidderId/purchased-objects', bidderController.getPurchasedObjectsByBidder);
 
-// Create a bid
-router.post('/bidder/:bidderId/bids', bidderController.createBid);
-// Remove a bid
-router.delete('/bidder/:bidderId/bids/:bidId', bidderController.deleteBid);
-// Update a bid
-router.put('/bidder/:bidderId/bids/:bidId', bidderController.updateBid);
-
 module.exports = router;
 

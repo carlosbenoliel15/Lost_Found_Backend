@@ -79,30 +79,3 @@ exports.getPurchasedObjectsByBidder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Create a bid
-exports.createBid = async (req, res) => {
-  try {
-    // Implement logic to create a bid
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Delete a bid
-exports.deleteBid = async (req, res) => {
-  try {
-    // Implement logic to delete a bid
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Update a bid
-exports.updateBid = async (req, res) => {
-  try {
-    // Implement logic to update a bid
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};

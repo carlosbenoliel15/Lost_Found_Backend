@@ -1,5 +1,6 @@
 const {AuctionModel, BidModel} = require('../models/Auction');
-const {UserModel} = require('../models/User');
+const {UserModel, BidderModel} = require('../models/User');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 const errorHandler = (res, error) => {
     console.error('Error:', error);
@@ -94,11 +95,18 @@ exports.getAllAuctionsByUserId = async (req, res) => {
         if (!user){
             return res.status(400).json({error: "User not found"});
         }
+
         //get all bids from user
-        const bids = await BidModel.find({bidder: user._id});
+        const bidder = await BidderModel.findOne({user: new ObjectId(user._id)});
+        if (!bidder){
+            return res.status(400).json({error: "Not participated in any auctions"});
+        }
+        
+        const bids = await BidModel.find({bidder: new ObjectId(bidder._id)});
         if (!bids){
             return res.status(400).json({error: "Not participated in any auctions"});
         }
+        
         //get all auctions from bids
         var auctions = [];
         for (var i = 0; i < bids.length; i++){
@@ -112,6 +120,6 @@ exports.getAllAuctionsByUserId = async (req, res) => {
         }
         return res.status(200).json(auctions);
     } catch (error){
-        return res.status(400).json({error: "Could not get auctions"});
+        return res.status(400).json({error: error.message});
     }
 }
