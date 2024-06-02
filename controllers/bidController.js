@@ -45,6 +45,7 @@ exports.makeBid = async (req, res) => {
     }
 }
 
+
 //get all bids for auction
 exports.getAllBidsByAuctionId = async (req, res) => {
     try{
@@ -66,8 +67,12 @@ exports.getCurrentBidByAuctionId = async (req, res) => {
         if (!auction){
             return res.status(400).json({error: "Auction not found"});
         }
-        const currentBid = auction.winnerBid;
+        const currentBid = await BidModel.findById(auction.winnerBid);
+        if (!currentBid){
+            return res.status(400).json({error: "Bid not found"});
+        }
         return res.status(200).json(currentBid);
+
     } catch (error){
         return res.status(400).json({error: "Could not get current bid"});
     }
