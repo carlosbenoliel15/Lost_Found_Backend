@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const objectController = require('../controllers/objectController');
 
+const multer = require("multer");
+
+const upload = multer({ dest: 'uploads/' })
+
 //---------------------------- Test  Route -----------------------------------
 router.get('/test', objectController.test);
 
 //---------------------------- Lost Objects  Route -----------------------------------
 
-router.post('/lost-objects', objectController.createLostObject);
+router.post('/lost-objects', upload.array('objectImage[]', 10),  objectController.createLostObject);
 router.get('/lost-objects', objectController.getAllLostObjects);
 router.get('/lost-objects/:lostObjectId', objectController.getLostObjectById);
 router.put('/lost-objects/:lostObjectId', objectController.updateLostObject);

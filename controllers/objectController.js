@@ -2,6 +2,7 @@ const { LostObjectModel, FoundObjectModel, CategoryModel, ObjSubCategoryModel, S
 const { UserModel, OwnerModel, PoliceOfficerModel } = require('../models/User');
 const { jwtDecode } = require("jwt-decode");
 const axios = require('axios');
+const cloudinaryService = require("../services/cloudinaryService");
 const DANDILION_API = process.env.DANDILION_API_KEY;
 const ObjectId = require('mongoose').Types.ObjectId;
 
@@ -34,6 +35,8 @@ exports.createLostObject = async (req, res) => {
     
     const newOwnerId = await OwnerModel.findOne({ user: ownerId });
     const userIdCheck = await UserModel.findById(ownerId);
+
+    let objectImages= []
     if (!newOwnerId && userIdCheck) {
       const newOwnerId = new OwnerModel({ user: ownerId });
       await newOwnerId.save();
@@ -42,10 +45,21 @@ exports.createLostObject = async (req, res) => {
     else if(newOwnerId){
       req.body.owner = newOwnerId;
     }
-
     const category = await CategoryModel.findOne({ name: req.body.category });
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
+    }
+
+    if (req.files) {
+      req.files.forEach((file)=> {
+        cloudinaryService.uploadImage(file.filename, 'objectImages').then( async result => {
+              objectImages.push(result.public_id.replace('objectImages/', ''))
+            }
+            , error => {
+              res.status(400).json({ error: error.message });
+            });
+      })
+
     }
     const subCategory = req.body.subCategory;
     const newLostObjectArgs = {
@@ -57,7 +71,7 @@ exports.createLostObject = async (req, res) => {
       price: req.body.price,
       lostDate: req.body.lostDate,
       status: req.body.status,
-      objectImage: req.body.objectImage
+      objectImage: objectImages
     };
     const newLostObjectFiltered = new LostObjectModel(newLostObjectArgs);
 
