@@ -524,8 +524,7 @@ exports.createFoundObject = async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
     newFoundObjectData.category = category._id;
-    const subCategory = req.body.subCategory;
-    const newFoundObject = new FoundObjectModel(newFoundObjectData);
+    const subCategory = JSON.parse(req.body.subCategory);    const newFoundObject = new FoundObjectModel(newFoundObjectData);
     for (const key in subCategory) {
       const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
       if (!subCategoryCheck) {
