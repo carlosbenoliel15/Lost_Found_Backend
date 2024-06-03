@@ -12,6 +12,16 @@ const errorHandler = (res, error) => {
   res.status(500).json({ error: 'Internal Server Error' });
 };
 
+//Upload de várias imagens
+const uploadImages = async (images) => {
+  let imagesArray=[]
+  for (const image in images){
+    const result = await cloudinaryService.uploadImage(images[image].filename, 'objectImages');
+    imagesArray.push(result.public_id.replace('objectImages/', ''))
+  }
+  return imagesArray;
+}
+
 //================================================================================================================================================================
 exports.test =  async (req, res) => {
   const response = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", { 
@@ -49,19 +59,11 @@ exports.createLostObject = async (req, res) => {
     if (!category) {
       return res.status(404).json({ error: 'Category not found' });
     }
-
     if (req.files) {
-      req.files.forEach((file)=> {
-        cloudinaryService.uploadImage(file.filename, 'objectImages').then( async result => {
-              objectImages.push(result.public_id.replace('objectImages/', ''))
-            }
-            , error => {
-              res.status(400).json({ error: error.message });
-            });
-      })
-
+      objectImages= await uploadImages(req.files);
     }
-    const subCategory = req.body.subCategory;
+
+    const subCategory = JSON.parse(req.body.subCategory);
     const newLostObjectArgs = {
       owner: req.body.owner,
       category: category._id,
@@ -99,7 +101,6 @@ exports.createLostObject = async (req, res) => {
       const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
       await subCategoryFiltered.save();
     }
-
     await newLostObjectFiltered.save();
     res.status(201).json({ message: 'LostObject created successfully' });
   } catch (error) {

@@ -42,7 +42,7 @@ const LostObjectSchema = new mongoose.Schema({
   price:{ type:Number, default:0 },
   lostDate: String,
   status: { type: String, enum: ['Lost', 'Claimed'], default: 'Lost' },
-  objectImage: String,
+  objectImage: Array,
 });
 const LostObjectModel = mongoose.model('LostObject', LostObjectSchema);
 
