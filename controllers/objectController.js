@@ -475,6 +475,11 @@ exports.getLostObjectByUserId = async (req, res) => {
 exports.createFoundObject = async (req, res) => {
   try {
     const resJson = {};
+
+    let objectImages=[];
+    if (req.files) {
+      objectImages= await uploadImages(req.files);
+    }
     const newFoundObjectData = {
       userWhoFound: req.body.userWhoFound,
       policeOfficerThatReceived: req.body.policeOfficerThatReceived,
@@ -487,7 +492,7 @@ exports.createFoundObject = async (req, res) => {
       claimant: req.body.claimant,
       foundDate: req.body.foundDate,
       endDate: req.body.endDate,
-      objectImage: req.body.objectImage
+      objectImage: objectImages
     };
 
     const dateParts1 = newFoundObjectData.foundDate.split('/');

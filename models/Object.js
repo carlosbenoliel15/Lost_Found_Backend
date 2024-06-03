@@ -59,7 +59,7 @@ const FoundObjectSchema = new mongoose.Schema({
   claimant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   foundDate: { type: String, required: true},
   endDate: String,
-  objectImage: String,
+  objectImage: Array,
 });
 const FoundObjectModel = mongoose.model('FoundObject', FoundObjectSchema);
 

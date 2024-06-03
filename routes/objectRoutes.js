@@ -19,7 +19,7 @@ router.delete('/lost-objects/:lostObjectId', objectController.deleteLostObject);
 router.post('/match/',objectController.getLostMatch);
 router.get('/lost-objects/user/:id', objectController.getLostObjectByUserId);
 
-router.post('/found-objects', objectController.createFoundObject);
+router.post('/found-objects', upload.array('objectImage[]', 10), objectController.createFoundObject);
 router.post('/found-objects_registeredUser', objectController.createFoundObject);
 router.get('/found-objects', objectController.getAllFoundObjects);
 router.get('/found-objects/:foundObjectId', objectController.getFoundObjectById);
