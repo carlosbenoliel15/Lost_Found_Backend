@@ -54,7 +54,8 @@ exports.getAllAuctions = async (req, res) => {
                 status: auction.status,
                 foundObjectTitle: foundObject.title, 
                 highestBid: highestBid, 
-                bids: bids
+                bids: bids,
+                objectImage: foundObject.objectImage
             });
         }
 
