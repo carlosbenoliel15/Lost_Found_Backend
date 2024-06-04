@@ -8,7 +8,7 @@ const errorHandler = (res, error) => {
 
 exports.makeBid = async (req, res) => {
     try {
-        const auction = await AuctionModel.findById(req.params.id);
+        const auction = await AuctionModel.findById(req.body.auction);
 
         const bidder = await BidderModel.findById(req.body.bidder);
         if (!bidder) {
@@ -18,6 +18,7 @@ exports.makeBid = async (req, res) => {
         }
 
         const bid = new BidModel(req.body);
+        console.log(bid);
         const auctionId = bid.auction;
         const bidderId = bid.bidder;
         const value = bid.value;
