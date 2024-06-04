@@ -3,28 +3,22 @@ const router = express.Router();
 const authController = require('../controllers/auctionController');
 const bidController = require('../controllers/bidController');
 
-//================================================ Actions general ================================================
-//create auction
-router.post('/', authController.createAuction);
-//get all auctions
-router.get('/', authController.getAllAuctions);
-//get auction by id
-router.get('/:id', authController.getAuctionById);
-//update auction by id
-router.put('/:id', authController.updateAuctionById);
-//delete auction by id
-router.delete('/:id', authController.deleteAuctionById);
-//get all auctions by user id
-router.get('/user/:userid', authController.getAllAuctionsByUserId);
+// Passar o objeto io para o controlador de leilão
+const auctionRoutes = (io) => {
+    // Rotas do leilão
+    router.post('/', authController.createAuction);
+    router.get('/', authController.getAllAuctions);
+    router.get('/:id', authController.getAuctionById);
+    router.put('/:id', authController.updateAuctionById);
+    router.delete('/:id', authController.deleteAuctionById);
+    router.get('/user/:userid', authController.getAllAuctionsByUserId);
 
-//================================================ Bid for auction ================================================
-//make bid
-router.post('/:id/makeBid', bidController.makeBid);
-//get all bids for auction
-router.get('/:id/bids', bidController.getAllBidsByAuctionId);
-//get current bid for auction
-router.get('/:id/bid', bidController.getCurrentBidByAuctionId);
+    // Rotas de lances para leilão
+    router.post('/:id/makeBid', bidController.makeBid);
+    router.get('/:id/bids', bidController.getAllBidsByAuctionId);
+    router.get('/:id/bid', bidController.getCurrentBidByAuctionId);
 
+    return router;
+}
 
-
-module.exports = router;
+module.exports = auctionRoutes;
