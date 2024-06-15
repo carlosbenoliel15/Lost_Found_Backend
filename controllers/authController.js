@@ -32,6 +32,7 @@ exports.generateToken = async (req, res) => {
 
 exports.forgetPasswordRedirect = async (req, res) => {
   const to = req.body.email;
+  const url = process.env.URL_APP;
   const emailVerrify = await UserModel.findOne({ email: to });
   if (!emailVerrify) {
     res.status(400).json({ error: 'Email not found' });
@@ -41,8 +42,8 @@ exports.forgetPasswordRedirect = async (req, res) => {
   let transporter = nodemailer.createTransport({
     service: 'gmail', // or use another email service
     auth: {
-      user: "bidfinderEmail@gmail.com",
-      pass: "ljin oklh rrdr ieyd"
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   });
   
@@ -50,7 +51,7 @@ exports.forgetPasswordRedirect = async (req, res) => {
   var line1 = `Hi ${to},`
   var line2 = `There was a request to change your password!`
   var line3 = `If you did not make this request then please ignore this email.`
-  var line4 = `Otherwise, please click this link to change your password: http://localhost:3000/reset-password/${emailToken}`
+  var line4 = `Otherwise, please click this link to change your password: ${url}/reset-password/${emailToken}`
 
   // Set up email data
   let mailOptions = {
