@@ -51,7 +51,7 @@ exports.forgetPasswordRedirect = async (req, res) => {
   var line1 = `Hi ${to},`
   var line2 = `There was a request to change your password!`
   var line3 = `If you did not make this request then please ignore this email.`
-  var line4 = `Otherwise, please click this link to change your password: ${url}/reset-password/${emailToken}`
+  var line4 = `Otherwise, please click this link to change your password: ${url}/resetPassword/${emailToken}`
 
   // Set up email data
   let mailOptions = {
