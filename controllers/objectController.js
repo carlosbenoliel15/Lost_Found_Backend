@@ -1,5 +1,6 @@
 const { LostObjectModel, FoundObjectModel, CategoryModel, ObjSubCategoryModel, SubCategoryModel, SubSubCategoryModel, SubSubCategoryAssociationModel} = require('../models/Object');
 const { UserModel, OwnerModel, PoliceOfficerModel } = require('../models/User');
+const {AuctionModel, BidModel} = require('../models/Auction');
 const { jwtDecode } = require("jwt-decode");
 const axios = require('axios');
 const cloudinaryService = require("../services/cloudinaryService");
@@ -674,6 +675,12 @@ exports.deleteFoundObject = async (req, res) => {
     for (const item of deletedSubCategories) {
       await ObjSubCategoryModel.findByIdAndDelete(item._id);
     }
+
+    const auctionsFound = await AuctionModel.find({ foundObject: new ObjectId(foundObjectId) });
+    for (const item of auctionsFound) {
+      await AuctionModel.findByIdAndDelete(item._id);
+    }
+
     const deletedFoundObject = await FoundObjectModel.findByIdAndDelete(foundObjectId);
     if (!deletedFoundObject) {
       return res.status(404).json({ error: 'FoundObject not found' });

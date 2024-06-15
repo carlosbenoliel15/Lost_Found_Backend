@@ -38,6 +38,9 @@ exports.getAllAuctions = async (req, res) => {
         var resList = [];
         for (var i = 0; i < auctions.length; i++){
             const foundObject = await FoundObjectModel.findById(auctions[i].foundObject);
+            if (!foundObject){
+                return res.status(400).json({error: "Object not found", auction: auctions[i]._id});
+            }
             const auction = auctions[i];
             const bids = await BidModel.find({auction: new ObjectId(auction._id)});
 
@@ -54,7 +57,7 @@ exports.getAllAuctions = async (req, res) => {
                 endDate: auction.endDate,
                 status: auction.status,
                 foundObjectTitle: foundObject.title, 
-                highestBid: highestBid, 
+                highestBid: highestBid,
                 bids: bids,
                 objectImage: foundObject.objectImage
             });
@@ -65,7 +68,7 @@ exports.getAllAuctions = async (req, res) => {
 
         return res.status(200).json(resList);
     } catch (error){
-        return res.status(400).json({error: "Could not get auctions"});
+        return res.status(400).json({error: error.message});
     }
 }
 
