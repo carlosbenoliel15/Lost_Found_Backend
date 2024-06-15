@@ -153,3 +153,48 @@ exports.getAllAuctionsByUserId = async (req, res) => {
         return res.status(400).json({error: error.message});
     }
 }
+
+//begin auction
+exports.beginAuction = async (req, res) => {
+    try{
+        const auction = await AuctionModel.findById(req.params.id);
+        if (!auction){
+            return res.status(400).json({error: "Auction not found"});
+        }
+        if (auction.status == "Open"){
+            return res.status(400).json({error: "Auction already active"});
+        }
+        if (auction.status == "Closed"){
+            return res.status(400).json({error: "Auction already ended"});
+        }
+        if (auction.startDate > Date.now()){
+            return res.status(400).json({error: "Auction has not started yet"});
+        }
+
+        auction.status = "Open";
+        await auction.save();
+        return res.status(200).json(auction);
+    } catch (error){
+        return res.status(400).json({error: "Could not begin auction"});
+    }
+}
+
+//end auction
+exports.endAuction = async (req, res) => {
+    try{
+        const auction = await AuctionModel.findById(req.params.id);
+        if (!auction){
+            return res.status(400).json({error: "Auction not found"});
+        }
+        if (auction.status == "Closed"){
+            return res.status(400).json({error: "Auction already ended"});
+        }
+        if (auction.status == "Open"){
+            auction.status = "Closed";
+            await auction.save();
+        }
+        return res.status(200).json(auction);
+    } catch (error){
+        return res.status(400).json({error: "Could not end auction"});
+    }
+}

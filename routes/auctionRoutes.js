@@ -16,6 +16,8 @@ router.put('/:id', authController.updateAuctionById);
 router.delete('/:id', authController.deleteAuctionById);
 //get all auctions by user id
 router.get('/user/:userid', authController.getAllAuctionsByUserId);
+//begin auction
+router.put('/:id/begin', authController.beginAuction);
 
 //================================================ Bid for auction ================================================
 //make bid
