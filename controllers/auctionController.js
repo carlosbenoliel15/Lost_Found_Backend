@@ -1,6 +1,7 @@
 const {AuctionModel, BidModel} = require('../models/Auction');
-const {UserModel, BidderModel} = require('../models/User');
+const {UserModel, BidderModel, PoliceOfficerModel} = require('../models/User');
 const {FoundObjectModel} = require('../models/Object');
+const {PoliceStationModel} = require('../models/Police');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const errorHandler = (res, error) => {
@@ -164,14 +165,9 @@ exports.beginAuction = async (req, res) => {
         if (auction.status == "Open"){
             return res.status(400).json({error: "Auction already active"});
         }
-        if (auction.status == "Closed"){
-            return res.status(400).json({error: "Auction already ended"});
-        }
-        if (auction.startDate > Date.now()){
-            return res.status(400).json({error: "Auction has not started yet"});
-        }
 
         auction.status = "Open";
+        auction.startDate = Date.now();
         await auction.save();
         return res.status(200).json(auction);
     } catch (error){
@@ -191,10 +187,33 @@ exports.endAuction = async (req, res) => {
         }
         if (auction.status == "Open"){
             auction.status = "Closed";
+            auction.endDate = Date.now();
             await auction.save();
         }
         return res.status(200).json(auction);
     } catch (error){
         return res.status(400).json({error: "Could not end auction"});
+    }
+}
+
+//where FoundObject is
+exports.whereIsAuction = async (req, res) => {
+    try{
+        const auction = await AuctionModel.findById(req.params.id);
+        if (!auction){
+            return res.status(400).json({error: "Auction not found"});
+        }
+        const foundObject = await FoundObjectModel.findById(auction.foundObject);
+        if (!foundObject){
+            return res.status(400).json({error: "Object not found"});
+        }
+        const policeOfficerThatReceived = await PoliceOfficerModel.findById(foundObject.policeOfficerThatReceived);
+        if (!policeOfficerThatReceived){
+            return res.status(400).json({error: "Police officer not found"});
+        }
+        const policeStation = await PoliceStationModel.findById(policeOfficerThatReceived.station);
+        return res.status(200).json(policeStation);
+    } catch (error){
+        return res.status(400).json({error: "Could not find object"});
     }
 }

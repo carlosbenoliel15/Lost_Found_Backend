@@ -14,12 +14,12 @@ const auctionRoutes = (io) => {
     router.get('/user/:userid', authController.getAllAuctionsByUserId);
     router.get('/:id/begin', authController.beginAuction);
     router.get('/:id/end', authController.endAuction);
+    router.get('/where/:id', authController.whereIsAuction);
 
     // Rotas de lances para leilão
     router.post('/:id/makeBid', bidController.makeBid);
     router.get('/:id/bids', bidController.getAllBidsByAuctionId);
     router.get('/:id/bid', bidController.getCurrentBidByAuctionId);
-
     return router;
 }
 
