@@ -10,12 +10,15 @@ const authService = {
 
       const user = await UserModel.findOne({ email });
       if (!user) {
-        throw new Error('Usuário não encontrado');
+        throw new Error('User not found');
       }
       
+      if(user.status === 'deactive'){
+        throw new Error('Deactivated user');
+      }
 
       if(user.password!== password){
-        throw new Error('credencias incorretas');
+        throw new Error('Wrong credentials');
       }
       // Gere um token JWT para o usuário
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
@@ -46,6 +49,7 @@ return userData;
       throw error;
     }
   },
+
   // Function to authenticate a user with Google client ID
   async authenticateUserWithGoogle(clientId) {
     try {
@@ -53,6 +57,11 @@ return userData;
       if (!user) {
         throw new Error('User not found');
       }
+
+      if(user.status === 'deactive'){
+        throw new Error('Deactivated user');
+      }
+
 
       // Generate a JWT token for the user
       const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
