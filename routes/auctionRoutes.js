@@ -12,8 +12,8 @@ const auctionRoutes = (io) => {
     router.put('/:id', authController.updateAuctionById);
     router.delete('/:id', authController.deleteAuctionById);
     router.get('/user/:userid', authController.getAllAuctionsByUserId);
-    router.get('/:id/begin', authController.beginAuction);
-    router.get('/:id/end', authController.endAuction);
+    router.put('/:id/begin', authController.beginAuction);
+    router.put('/:id/end', authController.endAuction);
     router.get('/where/:id', authController.whereIsAuction);
 
     // Rotas de lances para leilão

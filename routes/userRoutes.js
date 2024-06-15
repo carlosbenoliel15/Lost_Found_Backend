@@ -16,7 +16,8 @@ router.delete('/delete/:token', userController.deleteUserById);
 router.get('/profile/:token',userController.getUserInfo);
 router.get('/profileImage/:id', userController.getProfileImage);
 router.post('/getUser/', userController.getUser);
-//router.get('/findByEmail/:email', userController.
+router.put('/deactivate/:id', userController.deactivateUser);
+router.put('/activate/:id', userController.activateUser);
 
 //Routes for owner
 router.get('/owner/foundobjects/', ownerController.getListFoundObject);

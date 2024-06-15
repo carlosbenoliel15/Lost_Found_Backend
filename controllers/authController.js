@@ -82,3 +82,18 @@ exports.forgetPasswordRedirect = async (req, res) => {
       res.status(500).send(`Error: ${error.message}`);
   }
 };
+
+exports.forgetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    const email = jwtDecode(token).email;
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const updatedUser = await UserModel.findByIdAndUpdate(user._id, { password: password }, { new: true });
+    return res.status(200).json({ message: 'Password updated successfully'});
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to update password' });
+  }
+};

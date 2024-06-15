@@ -6,7 +6,6 @@ const cloudinary = require("cloudinary");
 
 const cloudinaryService = require('../services/cloudinaryService');
 
-
 exports.createUser = async (req, res) => {
   try {
     // Check if there is already a user with the same email
@@ -36,7 +35,6 @@ exports.createUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
@@ -120,7 +118,6 @@ exports.updateUserById = async (req, res) => {
 
 // Function to update user password with the provided ID
 exports.updatePassById = async (req, res) => {
-  console.log(123121)
   try {
     const userId = req.body.token;
     const oldPass = req.body.password;
@@ -146,7 +143,6 @@ exports.updatePassById = async (req, res) => {
   }
 }
 
-
 async function updatePassword(req, res) {
   try {
       // Logic to update password
@@ -171,26 +167,11 @@ async function updatePassword(req, res) {
   }
 }
 
-
-
-
 exports.deleteUserById = async (req, res) => {
   try {
     const userId = req.params.token;
     const token = jwtDecode(userId);
     const currentUser = await UserModel.findById(token["userId"]);
-    // Update records referencing the deleted user
-    //await LostObjectModel.updateMany({ owner: userId }, { owner: 'unknown user' });
-    //await FoundObjectModel.updateMany({ userWhoFound: userId }, { userWhoFound: 'unknown user' });
-    //await BidModel.deleteMany({ bidder: userId });
-
-    // Remove bids in auctions referencing the user
-    // const auctions = await AuctionModel.find({ 'winnerBid.bidder': userId });
-    // for (const auction of auctions) {
-    //   await BidModel.findByIdAndDelete(auction.winnerBid._id);
-    //   auction.winnerBid = null;
-    //   await auction.save();
-    // }
     // Delete the user
     await UserModel.findByIdAndDelete(currentUser);
 
@@ -199,7 +180,6 @@ exports.deleteUserById = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 exports.getUserInfo = async (req, res) => {
   try {
@@ -244,7 +224,6 @@ exports.getProfileImage = async (req, res) => {
   };
 };
 
-
 exports.getUser = async (req, res) => {
   try {
     const user = await UserModel.findOne(req.body);
@@ -254,6 +233,32 @@ exports.getUser = async (req, res) => {
     res.status(200).json(user);
   }
   catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.deactivateUser = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    await UserModel.findByIdAndUpdate(req.params.id, { status: 'deactive' });
+    res.status(200).json({ message: 'User deactivated' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.activateUser = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    await UserModel.findByIdAndUpdate(req.params.id, { status: 'active' });
+    res.status(200).json({ message: 'User activated' });
+  } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
