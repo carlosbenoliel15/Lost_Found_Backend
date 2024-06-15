@@ -12,6 +12,6 @@ router.get('/token/:token', authController.generateToken);
 router.post('/forgetPasswordRedirect', authController.forgetPasswordRedirect);
 
 // Rota para forgetPassword
-router.post('/forgetPassword', authController.forgetPassword);
+router.put('/forgetPassword', authController.forgetPassword);
 
 module.exports = router;

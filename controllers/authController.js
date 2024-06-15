@@ -42,8 +42,8 @@ exports.forgetPasswordRedirect = async (req, res) => {
   let transporter = nodemailer.createTransport({
     service: 'gmail', // or use another email service
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+      user: process.env.EMAIL_ADDRESS,
+      pass: process.env.EMAIL_PASSWORD
     }
   });
   
