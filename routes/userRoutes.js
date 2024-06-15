@@ -14,6 +14,7 @@ router.put('/update/',upload.single('profileImage'), userController.updateUserBy
 router.put('/updatePass/', userController.updatePassById);  
 router.delete('/delete/:token', userController.deleteUserById);
 router.get('/profile/:token',userController.getUserInfo);
+router.get('/userData/:id', userController.getUserData);
 router.get('/profileImage/:id', userController.getProfileImage);
 router.post('/getUser/', userController.getUser);
 router.put('/deactivate/:id', userController.deactivateUser);

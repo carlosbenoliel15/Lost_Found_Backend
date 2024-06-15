@@ -208,6 +208,21 @@ exports.getUserInfo = async (req, res) => {
 
 };
 
+exports.getUserData = async (req, res) => {
+  try {
+    const userId = req.params.id; // Pegue o ID do usuário diretamente dos parâmetros da URL
+    const currentUser = await UserModel.findById(userId);
+
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(200).json({ currentUser });
+  } catch (err) {
+    return res.status(500).json({ error: `Server error when trying to fetch users. ` + err });
+  }
+};
+
+
 exports.getProfileImage = async (req, res) => {
 
   try {
