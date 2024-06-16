@@ -37,8 +37,8 @@ exports.getBidsByBidder = async (req, res) => {
 // Get a bidder by ID
 exports.getBidderById = async (req, res) => {
   try {
-    const bidderId = req.params.bidderId;
-    const bidder = await BidderModel.findById(bidderId);
+    const userId = req.params.userId;
+    const bidder = await BidderModel.find({user: userId });
     res.status(200).json(bidder);
   } catch (error) {
     res.status(500).json({ error: error.message });

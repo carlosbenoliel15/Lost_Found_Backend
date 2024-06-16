@@ -30,7 +30,7 @@ router.post('/owner/:id', ownerController.createOwner);
 router.post('/bidder/', bidderController.createBidder);
 router.delete('/bidder/:bidderId', bidderController.removeBidder);
 router.get('/bidder/:bidderId/bids', bidderController.getBidsByBidder);
-router.get('/bidder/:bidderId', bidderController.getBidderById);
+router.get('/bidder/:userId', bidderController.getBidderById);
 router.get('/bidder/:bidderId/auctions', bidderController.getAuctionsByBidder);
 router.get('/bidder/:bidderId/won-auctions', bidderController.getWonAuctionsByBidder);
 router.get('/bidder/:bidderId/purchased-objects', bidderController.getPurchasedObjectsByBidder);
