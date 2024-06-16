@@ -1,5 +1,8 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const nodemailer = require('nodemailer');
+const {AuctionModel, BidModel, PaymentModel} = require('../models/Auction');
+const {BidderModel} = require('../models/User');
+
 
 exports.payment = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
@@ -80,5 +83,72 @@ exports.sendEmail = async (req, res) => {
         res.status(200).send(`Email sent: ${info.response}`);
     } catch (error) {
         res.status(500).send(`Error: ${error.message}`);
+    }
+}
+
+//============================================================================payment info================================================================================================
+exports.createPaymentInfo = async (req, res) => {
+    try {
+        const paymentVerify = await PaymentModel.findOne({paymentUser: req.body.paymentUser, paymentAuction: req.body.paymentAuction});
+        if (paymentVerify){
+            return res.status(400).json({error: "Payment already exists"});
+        }
+
+        const auction = await AuctionModel.findById(req.body.paymentAuction);
+        if (!auction){
+            return res.status(400).json({error: "Auction not found"});
+        }
+        else if (auction.status === 'Open'){
+            return res.status(400).json({error: "Auction is still open"});
+        }
+        else if (auction.status === 'Closed' && !auction.winnerBid){
+            return res.status(400).json({error: "Auction is closed but no winner bid not found"});
+        }
+
+        const bid = await BidModel.findById(auction.winnerBid); 
+
+        const bidder = await BidderModel.findById(req.body.paymentUser);
+        if (!bidder){
+            return res.status(400).json({error: "Bidder not found"});
+        }
+        else if (!bidder._id.equals(bid.bidder)){
+            return res.status(400).json({error: "This user don't have the winning bid for this auction"});
+        }
+
+        const paymentInfo = {}
+        paymentInfo.paymentUser = req.body.paymentUser;
+        paymentInfo.paymentAuction = req.body.paymentAuction;
+        paymentInfo.paymentValue = auction.winnerBid.value;
+
+        const payment = new PaymentModel(paymentInfo);
+        await payment.save();
+        res.status(200).json({message: "Payment info created"});
+    } catch (error) {
+        res.status(400).json({error: "Payment info not created"});
+    }
+}
+
+exports.getPaymentInfoById = async (req, res) => {
+    try {
+        const payment = await PaymentModel.findById(req.params.id);
+        if (!payment){
+            return res.status(400).json({error: "Payment info not found"});
+        }
+        res.status(200).json(payment);
+    } catch (error) {
+        res.status(400).json({error: "Payment info not found"});
+    }
+}
+
+exports.getPaymentInfoByUser = async (req, res) => {
+    try {
+        const payments = await PaymentModel.find({paymentUser: req.params.userid});
+        if (!payments){
+            return res.status(400).json({error: "Payment info not found"});
+        }
+        res.status(200).json(payments);
+    }
+    catch (error) {
+        res.status(400).json({error: "Payment info not found"});
     }
 }

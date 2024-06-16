@@ -171,6 +171,7 @@ exports.beginAuction = async (req, res) => {
 
         auction.status = "Open";
         auction.startDate = Date.now();
+        auction.winnerBid = null;
         await auction.save();
         return res.status(200).json(auction);
     } catch (error){
@@ -189,8 +190,18 @@ exports.endAuction = async (req, res) => {
             return res.status(400).json({error: "Auction already ended"});
         }
         if (auction.status == "Open"){
+            winnerbid = null;
+            const bids = await BidModel.find({auction: new ObjectId(auction._id)});
+            var highestBid = 0;
+            for (var i = 0; i < bids.length; i++){
+                if (bids[i].value > highestBid){
+                    highestBid = bids[i].value;
+                    winnerbid = bids[i];
+                }
+            }
             auction.status = "Closed";
             auction.endDate = Date.now();
+            auction.winnerBid = winnerbid;
             await auction.save();
         }
         return res.status(200).json(auction);
