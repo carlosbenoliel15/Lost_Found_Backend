@@ -42,6 +42,26 @@ exports.getPoliceStationById = async (req, res) => {
   }
 };
 
+exports.getPoliceStationNameByPoliceId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const policeOfficer = await PoliceOfficerModel.findById(id).populate('station');
+    
+    if (!policeOfficer) {
+      return res.status(404).json({ error: 'Police officer not found' });
+    }
+
+    const policeStation = policeOfficer.station;
+    const policeStationName = policeStation ? policeStation.name : 'No station assigned';
+
+    res.status(200).json({ policeStationName });
+  } catch (error) {
+    console.error(`Error fetching police station for officer ID ${req.params.id}:`, error);
+    res.status(500).json({ error: "Could not fetch police station name" });
+  }
+};
+
+
 exports.deletePoliceStation = async (req, res) => {
   try {
     const { id } = req.params;

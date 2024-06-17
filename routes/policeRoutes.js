@@ -9,14 +9,16 @@ const {
   createPoliceOfficer,
   updatePoliceOfficer,
   getPoliceOfficerById,
-  deletePoliceOfficer,
-  getPoliceOfficerByUserId
+  deletePoliceOfficer, 
+  getPoliceOfficerByUserId,
+  getPoliceStationNameByPoliceId
 } = require('../controllers/policeController');
 
 router.post('/police-stations', createPoliceStation);
 router.get('/police-stations', getPoliceStation);
 router.put('/police-stations/:id', updatePoliceStation);
 router.get('/police-stations/:id', getPoliceStationById);
+router.get('/police-stations/police-officers/:id', getPoliceStationNameByPoliceId );
 router.delete('/police-stations/:id', deletePoliceStation);
 
 router.post('/police-officers', createPoliceOfficer);
