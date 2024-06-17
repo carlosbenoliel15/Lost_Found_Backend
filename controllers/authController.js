@@ -12,7 +12,13 @@ exports.login = async (req, res) => {
     if (clientId) {
       userData = await authService.authenticateUserWithGoogle(clientId);
     } else {
-      userData = await authService.authenticateUser(email, password);
+     if(!req.body.time){
+      time = "1";
+      }
+      else{
+        time = req.body.time;
+      }
+      userData = await authService.authenticateUser(email, password, time);
     }
     res.json(userData);
   } catch (error) {
@@ -34,8 +40,11 @@ exports.forgetPasswordRedirect = async (req, res) => {
   const to = req.body.email;
   const url = process.env.URL_APP;
   const emailVerrify = await UserModel.findOne({ email: to });
+  console.log(emailVerrify);
   if (!emailVerrify) {
-    res.status(400).json({ error: 'Email not found' });
+
+   return res.status(400).json({ error: 'Email not found' });
+  
   }
   const emailToken = jwt.sign({ email: to }, JWT_SECRET);
   // Create a transporter object using SMTP transport.
