@@ -36,6 +36,22 @@ exports.createUser = async (req, res) => {
   }
 };
 
+exports.checkUserByEmail = async (req, res) => {
+     try {
+       const existingEmailUser = await UserModel.findOne({
+         email: req
+             .body.email
+       });
+       if (existingEmailUser) {
+         return res.status(200).json({exist: true});
+       }
+       res.status(200).json({exsit: false});
+     } catch (error) {
+         res.status(400).json({error: error.message});
+
+     }
+}
+
 // Function to update user data with the provided ID
 exports.updateUserById = async (req, res) => {
   try {

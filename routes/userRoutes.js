@@ -19,6 +19,7 @@ router.get('/profileImage/:id', userController.getProfileImage);
 router.post('/getUser/', userController.getUser);
 router.put('/deactivate/:id', userController.deactivateUser);
 router.put('/activate/:id', userController.activateUser);
+router.post('/checkByEmail/', userController.checkUserByEmail);
 
 //Routes for owner
 router.get('/owner/foundobjects/', ownerController.getListFoundObject);
