@@ -220,7 +220,7 @@ exports.policeDeliveryObjectAuction = async (req, res) => {
 
 exports.policeDeliveryObject = async (req, res) => {
   try {
-    const { lostid, foundid } = req.params;
+    const { lostid, foundid, ownerid } = req.params;
     const lostObject = await LostObjectModel.findById(lostid);
     const foundObject = await FoundObjectModel.findById(foundid);
     if (!lostObject || !foundObject) {
@@ -229,9 +229,10 @@ exports.policeDeliveryObject = async (req, res) => {
     if (foundObject.status === 'Claimed') {
       return res.status(400).json({ error: 'Object already claimed' });
     }
-    if (foundObject.status === 'Claimed') {
-      return res.status(400).json({ error: 'Object already claimed' });
+    if (lostObject.owner !== ownerid ) {
+      return res.status(400).json({ error: 'This user is not the owner of the object' });
     }
+
     foundObject.status = 'Claimed';
     foundObject.claimant = lostObject.owner;
     foundObject.save();
