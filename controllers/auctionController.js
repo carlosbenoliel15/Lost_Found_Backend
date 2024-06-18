@@ -191,17 +191,24 @@ exports.endAuction = async (req, res) => {
         }
         if (auction.status == "Open"){
             winnerbid = null;
+            winner = null;
             const bids = await BidModel.find({auction: new ObjectId(auction._id)});
             var highestBid = 0;
             for (var i = 0; i < bids.length; i++){
                 if (bids[i].value > highestBid){
                     highestBid = bids[i].value;
                     winnerbid = bids[i];
+                    winner = bids[i].bidder;
                 }
             }
             auction.status = "Closed";
             auction.endDate = Date.now();
             auction.winnerBid = winnerbid;
+
+            const found = await FoundObjectModel.findById(auction.foundObject);
+            found.claimant = winner;
+            await found.save();
+            
             await auction.save();
         }
         return res.status(200).json(auction);

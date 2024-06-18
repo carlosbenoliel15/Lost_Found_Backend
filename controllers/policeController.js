@@ -229,7 +229,7 @@ exports.policeDeliveryObject = async (req, res) => {
     if (foundObject.status === 'Claimed') {
       return res.status(400).json({ error: 'Object already claimed' });
     }
-    if (lostObject.owner !== ownerid ) {
+    if (lostObject.owner != ownerid ) {
       return res.status(400).json({ error: 'This user is not the owner of the object' });
     }
 
