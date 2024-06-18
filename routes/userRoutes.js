@@ -25,6 +25,7 @@ router.post('/checkByEmail/', userController.checkUserByEmail);
 //Routes for owner
 router.get('/owner/foundobjects/', ownerController.getListFoundObject);
 router.get('/owner/lostobjects/:id', ownerController.getListLostObject);
+router.get('/owner/:id', ownerController.getOwnerbyUserId);
 router.get('/owners/:id', ownerController.getOwnerInfo);
 router.post('/owner/:id', ownerController.createOwner);
 

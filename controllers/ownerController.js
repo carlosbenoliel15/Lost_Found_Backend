@@ -31,6 +31,15 @@ exports.getOwnerInfo = async (req, res) => {
     res.status(200).json(owner);
 }
 
+exports.getOwnerbyUserId = async (req, res) => {
+    const userId = req.params.id;
+    const owner = await OwnerModel.findOne({user : userId});
+    if (!owner) {
+        return res.status(404).json({ error: 'Owner not found' });
+    }
+    res.status(200).json(owner);
+}
+
 exports.createOwner = async (req, res) => {
     const userId = req.params.id;
     const ownerId = new OwnerModel.findOne({ user: userId });
