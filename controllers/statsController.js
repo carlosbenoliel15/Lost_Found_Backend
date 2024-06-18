@@ -34,7 +34,7 @@ const getFoundObjectsByCategory = async () => {
     { $group: { _id: "$category", count: { $sum: 1 } } },
     { $lookup: { from: "categories", localField: "_id", foreignField: "_id", as: "categoryDetails" } },
     { $unwind: "$categoryDetails" },
-    { $project: { categoryName: "$categoryDetails.name", count: 1 } }
+    { $project: { name: "$categoryDetails.name", count: 1 } }
   ]);
 };
 
