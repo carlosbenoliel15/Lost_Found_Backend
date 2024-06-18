@@ -11,7 +11,9 @@ const {
   getPoliceOfficerById,
   deletePoliceOfficer, 
   getPoliceOfficerByUserId,
-  getPoliceStationNameByPoliceId
+  getPoliceStationNameByPoliceId,
+  policeDeliveryObjectAuction,
+  policeDeliveryObject
 } = require('../controllers/policeController');
 
 router.post('/police-stations', createPoliceStation);
@@ -26,5 +28,7 @@ router.put('/police-officers/:id', updatePoliceOfficer);
 router.get('/police-officers/:id', getPoliceOfficerById);
 router.delete('/police-officers/:id', deletePoliceOfficer);
 router.get('/police-officers/users/:id', getPoliceOfficerByUserId);
+router.put('/police-officers/auction/:bidderid/:foundid', policeDeliveryObjectAuction);
+router.put('/police-officers/delivery/:lostid/:foundid', policeDeliveryObject);
 
 module.exports = router;

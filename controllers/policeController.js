@@ -1,5 +1,5 @@
 const {PoliceStationModel}= require('../models/Police');
-const {UserModel,PoliceOfficerModel} = require('../models/User');
+const {UserModel,PoliceOfficerModel,BidderModel} = require('../models/User');
 const { jwtDecode } = require("jwt-decode");
 const { LostObjectModel, FoundObjectModel, CategoryModel } = require('../models/Object');
 
@@ -60,7 +60,6 @@ exports.getPoliceStationNameByPoliceId = async (req, res) => {
     res.status(500).json({ error: "Could not fetch police station name" });
   }
 };
-
 
 exports.deletePoliceStation = async (req, res) => {
   try {
@@ -195,5 +194,51 @@ exports.getPoliceOfficerByUserId = async (req, res) => {
   }
   catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+exports.policeDeliveryObjectAuction = async (req, res) => {
+  try {
+    const { bidderid, foundid } = req.params;
+    const bidder = await BidderModel.findById(bidderid);
+    const foundObject = await FoundObjectModel.findById(foundid);
+    if (!bidder || !foundObject) {
+      return res.status(404).json({ error: 'Object not found' });
+    }
+    if (foundObject.status === 'Claimed') {
+      return res.status(400).json({ error: 'Object already claimed' });
+    }
+    foundObject.status = 'Claimed';
+    foundObject.claimant = bidder.user;
+    foundObject.save();
+    res.status(200).json({ message: 'Object claimed successfully' });
+  }
+  catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.policeDeliveryObject = async (req, res) => {
+  try {
+    const { lostid, foundid } = req.params;
+    const lostObject = await LostObjectModel.findById(lostid);
+    const foundObject = await FoundObjectModel.findById(foundid);
+    if (!lostObject || !foundObject) {
+      return res.status(404).json({ error: 'Object not found' });
+    }
+    if (foundObject.status === 'Claimed') {
+      return res.status(400).json({ error: 'Object already claimed' });
+    }
+    if (foundObject.status === 'Claimed') {
+      return res.status(400).json({ error: 'Object already claimed' });
+    }
+    foundObject.status = 'Claimed';
+    foundObject.claimant = lostObject.owner;
+    foundObject.save();
+    lostObject.status = 'Claimed';
+    lostObject.save();
+    res.status(200).json({ message: 'Object claimed successfully' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 }

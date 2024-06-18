@@ -146,6 +146,8 @@ exports.getPaymentInfoByUser = async (req, res) => {
         if (!payments){
             return res.status(400).json({error: "Payment info not found"});
         }
+
+        
         res.status(200).json(payments);
     }
     catch (error) {
