@@ -28,7 +28,7 @@ router.put('/police-officers/:id', updatePoliceOfficer);
 router.get('/police-officers/:id', getPoliceOfficerById);
 router.delete('/police-officers/:id', deletePoliceOfficer);
 router.get('/police-officers/users/:id', getPoliceOfficerByUserId);
-router.put('/police-officers/auction/:bidderid/:foundid', policeDeliveryObjectAuction);
+router.put('/police-officers/auction/:bidderid/:auctionid', policeDeliveryObjectAuction);
 router.put('/police-officers/delivery/:lostid/:foundid/:ownerid', policeDeliveryObject);
 
 module.exports = router;

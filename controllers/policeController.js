@@ -2,6 +2,7 @@ const {PoliceStationModel}= require('../models/Police');
 const {UserModel,PoliceOfficerModel,BidderModel} = require('../models/User');
 const { jwtDecode } = require("jwt-decode");
 const { LostObjectModel, FoundObjectModel, CategoryModel } = require('../models/Object');
+const { AuctionModel, PaymentModel } = require('../models/Auction');
 
 exports.createPoliceStation = async (req, res) => {
   try {
@@ -199,17 +200,26 @@ exports.getPoliceOfficerByUserId = async (req, res) => {
 
 exports.policeDeliveryObjectAuction = async (req, res) => {
   try {
-    const { bidderid, foundid } = req.params;
+    const { bidderid, auctionid } = req.params;
     const bidder = await BidderModel.findById(bidderid);
-    const foundObject = await FoundObjectModel.findById(foundid);
-    if (!bidder || !foundObject) {
+    const auction = await AuctionModel.findById(auctionid);
+    const foundObject = await FoundObjectModel.findById(auction.foundObject);
+    const payment = await PaymentModel.find({paymentAuction : auctionid})
+
+    if (!bidder || !auction || !foundObject || !payment) {
       return res.status(404).json({ error: 'Object not found' });
     }
     if (foundObject.status === 'Claimed') {
       return res.status(400).json({ error: 'Object already claimed' });
     }
+    if (foundObject.claimant != bidderid) {
+      return res.status(400).json({ error: 'The user is not the owner of the auctioned object' });
+    }
+    if (payment[0].paymentStatus === "Not Paid") {
+      return res.status(400).json({ error: 'The auction was not yet paid' });
+    }
+
     foundObject.status = 'Claimed';
-    foundObject.claimant = bidder.user;
     foundObject.save();
     res.status(200).json({ message: 'Object claimed successfully' });
   }
