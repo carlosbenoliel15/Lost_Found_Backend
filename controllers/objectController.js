@@ -469,6 +469,66 @@ exports.getLostObjectByUserId = async (req, res) => {
   }
 };
 
+// Get LostObjects by Description
+exports.getLostObjectByDescription = async (req, res) => {
+  try {
+    const description = req.params.description;
+    const lostObject = await LostObjectModel.find();
+
+    const resArray = [];
+    for (const item of lostObject) {
+      const response = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", { 
+        params: {
+          text1: description,
+          text2: item.description,
+          token: DANDILION_API,
+          bow: "always" 
+        }
+      });
+      if (response.data.similarity > 0.1){
+        const resJson = {};
+      const categoryName = await CategoryModel.findById(item.category);
+      resJson.object_id = item._id;
+      resJson.owner = item.owner;
+      resJson.title = item.title;
+      resJson.description = item.description;
+      resJson.location = item.location;
+      resJson.price = item.price;
+      resJson.lostDate = item.lostDate;
+      resJson.status = item.status;
+      resJson.objectImage = item.objectImage;
+      resJson.similarity = response.data.similarity;
+      resJson.category_id = categoryName._id;
+      resJson.category = categoryName.name;
+
+      const subCategories = await ObjSubCategoryModel.find({ object: item._id });
+      const subCategoriesArray = [];
+
+      for (const item of subCategories) {
+        const subCategoryJson = {};
+        const subCategory = await SubCategoryModel.findById(item.subCategory);
+        subCategoryJson.objSubCategory_id = item._id;
+        subCategoryJson.subCategory_id = subCategory._id;
+        subCategoryJson.subCategory = subCategory.name;
+        subCategoryJson.subSubCategories = item.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
+        subCategoriesArray.push(subCategoryJson);
+      }
+
+      resJson.subCategories = subCategoriesArray;
+      resArray.push(resJson);
+      }
+    }
+
+    if (!lostObject) {
+      return res.status(404).json({ error: 'LostObjects not found' });
+    }
+    res.status(200).json(resArray);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
 
 //------------------------------------------------------------------Found Object Functions ---------------------------------------------------------------------
 
