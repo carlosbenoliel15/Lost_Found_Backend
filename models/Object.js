@@ -43,6 +43,7 @@ const LostObjectSchema = new mongoose.Schema({
   lostDate: String,
   status: { type: String, enum: ['Lost', 'Claimed'], default: 'Lost' },
   objectImage: Array,
+  coordinates: String,
 });
 const LostObjectModel = mongoose.model('LostObject', LostObjectSchema);
 
@@ -60,6 +61,7 @@ const FoundObjectSchema = new mongoose.Schema({
   foundDate: { type: String, required: true},
   endDate: String,
   objectImage: Array,
+  coordinates: String,
 });
 const FoundObjectModel = mongoose.model('FoundObject', FoundObjectSchema);
 
