@@ -5,7 +5,7 @@ const AuctionSchema = new mongoose.Schema({
   foundObject: { type: mongoose.Schema.Types.ObjectId, ref: 'FoundObject',required:true},
   endDate:{type: Date , required: true },
   startDate: {type: Date, required: true },
-  status: { type: String, enum: ['Open', 'Closed'], default: 'Open' },
+  status: { type: String, enum: ['Open', 'Closed','Scheduled'], default: 'Scheduled' },
   winnerBid: { type: mongoose.Schema.Types.ObjectId, ref: 'Bid' }
 });
 
