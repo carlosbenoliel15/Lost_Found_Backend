@@ -95,18 +95,24 @@ exports.createPoliceOfficer = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: 'Police officer already exists' });
     }
+    const policeOfficer = await PoliceOfficerModel.findOne({ police_id: req.body.police_id });
+    if (policeOfficer) {
+      return res.status(400).json({ error: 'Police officer already exists' });
+    }
+    const policeStation = await PoliceStationModel.findById(req.body.station);
+    if (!policeStation) {
+      return res.status(404).json({ error: 'Police station not found' });
+    }
+
     const newUser = new UserModel(userInfo);
     await newUser.save();
+    
     const policeman = {
       user: newUser._id,
       police_id: req.body.police_id,
       station: req.body.station
     }
 
-    const policeOfficer = await PoliceOfficerModel.findOne({ police_id: req.body.police_id });
-    if (policeOfficer) {
-      return res.status(400).json({ error: 'Police officer already exists' });
-    }
     const newPoliceOfficer = new PoliceOfficerModel(policeman);
     await newPoliceOfficer.save();
 
