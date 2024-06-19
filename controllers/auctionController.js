@@ -133,12 +133,12 @@ exports.getAllAuctionsByUserId = async (req, res) => {
         //get all bids from user
         const bidder = await BidderModel.findOne({user: new ObjectId(user._id)});
         if (!bidder){
-            return res.status(400).json({error: "Not participated in any auctions"});
+            return res.status(200).json({message: "Not participated in any auctions"});
         }
         
         const bids = await BidModel.find({bidder: new ObjectId(bidder._id)});
         if (!bids){
-            return res.status(400).json({error: "Not participated in any auctions"});
+            return res.status(200).json({message: "Not participated in any auctions"});
         }
         
         //get all auctions from bids
