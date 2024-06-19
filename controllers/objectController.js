@@ -390,6 +390,14 @@ exports.getLostMatch = async (req, res) => {
       //calculate the total similarity
       const totalSimilarity = ((categorySimilarity + titleSimilarity + descriptionSimilarity + locationSimilarity + subCategorySimilarity + priceSimilarity)/(categoryWeight +titleWeight + descriptionWeight + locationWeight + subCategoryWeight + priceWeight)) * 100;
       foundArray[i].similarity = totalSimilarity;
+      foundArray[i].similarityItems = {
+        category: categorySimilarity,
+        title: titleSimilarity,
+        description: descriptionSimilarity,
+        location: locationSimilarity,
+        subCategory: subCategorySimilarity,
+        price: priceSimilarity
+      }
 
       //reject the found objects that have a similarity less than 1%
       if (totalSimilarity >= 0.01){
@@ -604,8 +612,6 @@ exports.getClaimedLostObject = async (req, res) => {
     errorHandler(res, error);
   }
 };
-
-
 
 //------------------------------------------------------------------Found Object Functions ---------------------------------------------------------------------
 
