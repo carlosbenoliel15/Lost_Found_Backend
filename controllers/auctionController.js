@@ -179,7 +179,7 @@ exports.beginAuction = async (req, res) => {
     }
 }
 
-//end auction
+//end auction (not tested)
 exports.endAuction = async (req, res) => {
     try{
         const auction = await AuctionModel.findById(req.params.id);
@@ -208,9 +208,50 @@ exports.endAuction = async (req, res) => {
             const found = await FoundObjectModel.findById(auction.foundObject);
             found.claimant = winner;
             await found.save();
-            
             await auction.save();
+
+            if (winner != null){
+                const user = await UserModel.findById(winner.user);
+                if (!user){
+                    return res.status(400).json({error: "User not found"});
+                }
+
+                let transporter = nodemailer.createTransport({
+                    service: 'gmail', // or use another email service
+                    auth: {
+                      user: process.env.EMAIL_ADDRESS,
+                      pass: process.env.EMAIL_PASSWORD
+                    }
+                });
+
+                var text = `Hi ${user.first_name} ${user.last_name},\nCongratulations! You have won the auction for the object ${found.title}! Please go and pay the item.`;
+                var line1 = `Hi ${user.first_name} ${user.last_name},`;
+                var line2 = `Congratulations! You have won the auction for the object ${found.title}!`;
+                var line3 = `Please go and pay the item.`;
+
+                let mailOptions = {
+                    from: "no-reply@bidfinder.ddns.net",
+                    to: user.email,
+                    subject: "Auction status",
+                    text: text,
+                    html: `
+                    <p>${line1}</p>
+                    <p>${line2}</p>
+                    <p>${line3}</p>
+                    <img src="cid:unique@icon.cid" alt="Icon" />`,
+                    attachments: [
+                        {
+                            filename: 'icon.png',
+                            path: 'logo.png',
+                            cid: 'unique@icon.cid'
+                        }
+                    ]
+                };
+                await transporter.sendMail(mailOptions);
+            }
+            
         }
+
         return res.status(200).json(auction);
     } catch (error){
         return res.status(400).json({error: "Could not end auction"});
