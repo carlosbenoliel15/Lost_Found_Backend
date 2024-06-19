@@ -403,17 +403,7 @@ exports.getLostMatch = async (req, res) => {
       if (totalSimilarity >= 0.01){
         resultArray.push(foundArray[i]);
       }
-      console.log("=====================================================================================================");
-      console.log("The similarity between the lost object and the found object is: " + totalSimilarity);
-      console.log("The found object is: " + foundArray[i].object_id);
-      console.log("Category similarity: " + categorySimilarity);
-      console.log("Title similarity: " + titleSimilarity);
-      console.log("Description similarity: " + descriptionSimilarity);
-      console.log("SubCategory similarity: " + subCategorySimilarity);
-      console.log("Price similarity: " + priceSimilarity);
-
     }
-    
     res.status(200).json(resultArray);
   } catch (error) {
     errorHandler(res, error);
