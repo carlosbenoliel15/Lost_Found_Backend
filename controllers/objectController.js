@@ -6,6 +6,7 @@ const axios = require('axios');
 const cloudinaryService = require("../services/cloudinaryService");
 const DANDILION_API = process.env.DANDILION_API_KEY;
 const ObjectId = require('mongoose').Types.ObjectId;
+const nodemailer = require('nodemailer');
 
 // Middleware de tratamento de erros
 const errorHandler = (res, error) => {
@@ -133,6 +134,7 @@ exports.getAllLostObjects = async (req, res) => {
       resJson.objectImage = item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
 
       const subCategories = await ObjSubCategoryModel.find({ object: item._id });
       const subCategoriesArray = [];
@@ -177,6 +179,7 @@ exports.getLostObjectById = async (req, res) => {
     resJson.objectImage = lostObject.objectImage;
     resJson.category_id = categoryName._id;
     resJson.category = categoryName.name;
+    resJson.coordinates = lostObject.coordinates;
 
     const subCategories = await ObjSubCategoryModel.find({ object: lostObjectId });
     const subCategoriesArray = [];
@@ -445,6 +448,7 @@ exports.getLostObjectByUserId = async (req, res) => {
       resJson.objectImage = item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
 
       const subCategories = await ObjSubCategoryModel.find({ object: item._id });
       const subCategoriesArray = [];
@@ -499,6 +503,7 @@ exports.getLostObjectByDescription = async (req, res) => {
       resJson.similarity = response.data.similarity;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
 
       const subCategories = await ObjSubCategoryModel.find({ object: item._id });
       const subCategoriesArray = [];
@@ -547,7 +552,20 @@ exports.acceptLostMatch = async (req, res) => {
     foundObject.claimant = lostObject.owner;
     await lostObject.save();
     await foundObject.save();
-    res.status(200).json({ message: 'Match accepted successfully' });
+
+    //send an email to the owner of the lost object
+    let transporter = nodemailer.createTransport({
+      service: 'gmail', // or use another email service
+      auth: {
+        user: process.env.EMAIL_ADDRESS,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+
+
+
+    res.status(200).json({ message: 'Match accepted successfully an email was sent to you with the information of the object'});
   } catch (error) {
     errorHandler(res, error);
   }
@@ -580,6 +598,7 @@ exports.getClaimedLostObject = async (req, res) => {
       resJson.objectImage = item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
       
       const subCategories = await ObjSubCategoryModel.find({ object: item._id });
       const subCategoriesArray = [];
@@ -626,7 +645,8 @@ exports.createFoundObject = async (req, res) => {
       claimant: req.body.claimant,
       foundDate: req.body.foundDate,
       endDate: req.body.endDate,
-      objectImage: objectImages
+      objectImage: objectImages,
+      coordinates: req.body.coordinates
     };
 
     const dateParts1 = newFoundObjectData.foundDate.split('/');
@@ -715,6 +735,7 @@ exports.getAllFoundObjects = async (req, res) => {
       resJson.objectImage = item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
 
       const subCategories = await ObjSubCategoryModel.find({ object: item._id });
       const subCategoriesArray = [];
@@ -762,6 +783,7 @@ exports.getFoundObjectById = async (req, res) => {
     resJson.objectImage = foundObject.objectImage;
     resJson.category_id = categoryName._id;
     resJson.category = categoryName.name;
+    resJson.coordinates = foundObject.coordinates;
 
     const subCategories = await ObjSubCategoryModel.find({ object: foundObject._id });
     const subCategoriesArray = [];
