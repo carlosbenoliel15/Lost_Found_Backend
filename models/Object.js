@@ -41,7 +41,7 @@ const LostObjectSchema = new mongoose.Schema({
   location: { type: String, required: true },
   price:{ type:Number, default:0 },
   lostDate: String,
-  status: { type: String, enum: ['Lost', 'Claimed'], default: 'Lost' },
+  status: { type: String, enum: ['Lost', 'accepted', 'Claimed'], default: 'Lost' },
   objectImage: Array,
   coordinates: String,
 });
@@ -56,7 +56,7 @@ const FoundObjectSchema = new mongoose.Schema({
   description: { type: String, required: true },
   location: { type: String, required: true },
   price:{ type:Number, default:0 },
-  status: { type: String, enum: ['Found', 'Delivered to Police', 'Claimed', 'In Auction', 'Auctioned'], default: 'Found' },
+  status: { type: String, enum: ['Found', 'accepted', 'Delivered to Police', 'Claimed', 'In Auction', 'Auctioned'], default: 'Found' },
   claimant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   foundDate: { type: String, required: true},
   endDate: String,

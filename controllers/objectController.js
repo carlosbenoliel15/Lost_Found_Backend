@@ -530,6 +530,82 @@ exports.getLostObjectByDescription = async (req, res) => {
   }
 };
 
+// Accept
+exports.acceptLostMatch = async (req, res) => {
+  try {
+    const lostObjectId = req.body.lostObjectId;
+    const foundObjectId = req.body.foundObjectId;
+    const lostObject = await LostObjectModel.findById(lostObjectId);
+    if (!lostObject) {
+      return res.status(404).json({ error: 'LostObject not found' });
+    }
+    const foundObject = await FoundObjectModel.findById(foundObjectId);
+    if (!foundObject) {
+      return res.status(404).json({ error: 'FoundObject not found' });
+    }
+    lostObject.status = 'accepted';
+    foundObject.status = 'accepted';
+    foundObject.claimant = lostObject.owner;
+    await lostObject.save();
+    await foundObject.save();
+    res.status(200).json({ message: 'Match accepted successfully' });
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
+// List Claimed Lost Objects (test)
+exports.getClaimedLostObject = async (req, res) => {
+  try {
+    const ownerId = req.params.ownerid;
+    const owner = await UserModel.findById(ownerId);
+    if (!owner) {
+      return res.status(404).json({ error: 'Owner not found' });
+    }
+    const claimedLostObjects = await LostObjectModel.find({ owner: owner._id, status: 'Claimed' });
+    if (!claimedLostObjects) {
+      return res.status(404).json({ error: 'Claimed LostObjects not found' });
+    }
+    const resArray = [];
+    for (const item of claimedLostObjects) {
+      const resJson = {};
+      const categoryName = await CategoryModel.findById(item.category);
+      resJson.object_id = item._id;
+      resJson.owner = item.owner;
+      resJson.title = item.title;
+      resJson.description = item.description;
+      resJson.location = item.location;
+      resJson.price = item.price;
+      resJson.lostDate = item.lostDate;
+      resJson.status = item.status;
+      resJson.objectImage = item.objectImage;
+      resJson.category_id = categoryName._id;
+      resJson.category = categoryName.name;
+      
+      const subCategories = await ObjSubCategoryModel.find({ object: item._id });
+      const subCategoriesArray = [];
+      for (const item of subCategories) {
+        const subCategoryJson = {};
+        const subCategory = await SubCategoryModel.findById(item.subCategory);
+        subCategoryJson.objSubCategory_id = item._id;
+        subCategoryJson.subCategory_id = subCategory._id;
+        subCategoryJson.subCategory = subCategory.name;
+        subCategoryJson.subSubCategories = item.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
+        subCategoriesArray.push(subCategoryJson);
+      }
+      resJson.subCategories = subCategoriesArray;
+      resArray.push(resJson);
+    }
+    res.status(200).json(resArray);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
+
+
 //------------------------------------------------------------------Found Object Functions ---------------------------------------------------------------------
 
 // Create a new FoundObject
