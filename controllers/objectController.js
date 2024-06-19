@@ -476,53 +476,54 @@ exports.getLostObjectByUserId = async (req, res) => {
 // Get LostObjects by Description
 exports.getLostObjectByDescription = async (req, res) => {
   try {
-    const description = req.params.description;
+    const description = req.body.description;
     const lostObject = await LostObjectModel.find();
 
     const resArray = [];
     for (const item of lostObject) {
-      const response = await axios.get("https://api.dandelion.eu/datatxt/sim/v1/", { 
+      const response = await axios.get("https://api.dandelion.eu/datatxt/sim/v1", { 
         params: {
           text1: description,
           text2: item.description,
           token: DANDILION_API,
-          bow: "always" 
+          bow: "always",
+          lang: "en" 
         }
       });
       if (response.data.similarity > 0.1){
         const resJson = {};
-      const categoryName = await CategoryModel.findById(item.category);
-      resJson.object_id = item._id;
-      resJson.owner = item.owner;
-      resJson.title = item.title;
-      resJson.description = item.description;
-      resJson.location = item.location;
-      resJson.price = item.price;
-      resJson.lostDate = item.lostDate;
-      resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
-      resJson.similarity = response.data.similarity;
-      resJson.category_id = categoryName._id;
-      resJson.category = categoryName.name;
-      resJson.coordinates = item.coordinates;
+        const categoryName = await CategoryModel.findById(item.category);
+        resJson.object_id = item._id;
+        resJson.owner = item.owner;
+        resJson.title = item.title;
+        resJson.description = item.description;
+        resJson.location = item.location;
+        resJson.price = item.price;
+        resJson.lostDate = item.lostDate;
+        resJson.status = item.status;
+        resJson.objectImage = item.objectImage;
+        resJson.similarity = response.data.similarity;
+        resJson.category_id = categoryName._id;
+        resJson.category = categoryName.name;
+        resJson.coordinates = item.coordinates;
 
-      const subCategories = await ObjSubCategoryModel.find({ object: item._id });
-      const subCategoriesArray = [];
+        const subCategories = await ObjSubCategoryModel.find({ object: item._id });
+        const subCategoriesArray = [];
 
-      for (const item of subCategories) {
-        const subCategoryJson = {};
-        const subCategory = await SubCategoryModel.findById(item.subCategory);
-        subCategoryJson.objSubCategory_id = item._id;
-        subCategoryJson.subCategory_id = subCategory._id;
-        subCategoryJson.subCategory = subCategory.name;
-        subCategoryJson.subSubCategories = item.subSubCategory;
-        const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
-        subCategoryJson.subSubCategoryName = subSubCategory.name;
-        subCategoriesArray.push(subCategoryJson);
-      }
+        for (const item of subCategories) {
+          const subCategoryJson = {};
+          const subCategory = await SubCategoryModel.findById(item.subCategory);
+          subCategoryJson.objSubCategory_id = item._id;
+          subCategoryJson.subCategory_id = subCategory._id;
+          subCategoryJson.subCategory = subCategory.name;
+          subCategoryJson.subSubCategories = item.subSubCategory;
+          const subSubCategory = await SubSubCategoryModel.findById(item.subSubCategory);
+          subCategoryJson.subSubCategoryName = subSubCategory.name;
+          subCategoriesArray.push(subCategoryJson);
+        }
 
-      resJson.subCategories = subCategoriesArray;
-      resArray.push(resJson);
+        resJson.subCategories = subCategoriesArray;
+        resArray.push(resJson);
       }
     }
 
