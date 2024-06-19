@@ -74,7 +74,8 @@ exports.createLostObject = async (req, res) => {
       price: req.body.price,
       lostDate: req.body.lostDate,
       status: req.body.status,
-      objectImage: objectImages
+      objectImage: objectImages,
+      coordinates: req.body.coordinates
     };
     const newLostObjectFiltered = new LostObjectModel(newLostObjectArgs);
 
