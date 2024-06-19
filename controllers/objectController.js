@@ -1,6 +1,7 @@
 const { LostObjectModel, FoundObjectModel, CategoryModel, ObjSubCategoryModel, SubCategoryModel, SubSubCategoryModel, SubSubCategoryAssociationModel} = require('../models/Object');
 const { UserModel, OwnerModel, PoliceOfficerModel } = require('../models/User');
 const {AuctionModel, BidModel} = require('../models/Auction');
+const {PoliceStationModel} = require('../models/Police');
 const { jwtDecode } = require("jwt-decode");
 const axios = require('axios');
 const cloudinaryService = require("../services/cloudinaryService");
@@ -534,7 +535,7 @@ exports.getLostObjectByDescription = async (req, res) => {
   }
 };
 
-// Accept
+// Accept (not tested)
 exports.acceptLostMatch = async (req, res) => {
   try {
     const lostObjectId = req.body.lostObjectId;
@@ -553,6 +554,23 @@ exports.acceptLostMatch = async (req, res) => {
     await lostObject.save();
     await foundObject.save();
 
+    const owner = await OwnerModel.findById(lostObject.owner);
+    if (!owner) {
+      return res.status(404).json({ error: 'Owner not found' });
+    }
+    const user = await UserModel.findById(owner.user);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const policeOfficer = await PoliceOfficerModel.findById(foundObject.policeOfficerThatReceived);
+    if (!policeOfficer) {
+      return res.status(404).json({ error: 'PoliceOfficer not found' });
+    }
+    const policeStation = await PoliceStationModel.findById(policeOfficer.station);
+    if (!policeStation) {
+      return res.status(404).json({ error: 'PoliceStation not found' });
+    }
+    
     //send an email to the owner of the lost object
     let transporter = nodemailer.createTransport({
       service: 'gmail', // or use another email service
@@ -562,16 +580,43 @@ exports.acceptLostMatch = async (req, res) => {
       }
     });
 
+    var text = `Hi ${user.first_name} ${user.last_name},\n You accepected the match with delivered object ${foundObject.title}.\nGo to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back. Present this codes: \nFound Object: ${foundObject._id}\nLost Object: ${lostObject._id}`;  
+    var line1 = `Hi ${user.first_name} ${user.last_name},`
+    var line2 = `You accepected the match with delivered object ${foundObject.title}.`
+    var line3 = `Go to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back.`
+    var line4 = `Present this codes:`
+    var line5 = `Found Object: ${foundObject._id}`
+    var line6 = `Lost Object: ${lostObject._id}`
 
-
-
+    let mailOptions = {
+      from: "no-reply@bidfinder.ddns.net",
+      to: user.email,
+      subject: "Match accepted",
+      text: text,
+      html: `
+      <p>${line1}</p>
+      <p>${line2}</p>
+      <p>${line3}</p>
+      <p>${line4}</p>
+      <p>${line5}</p>
+      <p>${line6}</p>
+      <img src="cid:unique@icon.cid" alt="Icon" />`,
+      attachments: [
+          {
+              filename: 'icon.png',
+              path: 'logo.png',
+              cid: 'unique@icon.cid'
+          }
+      ]
+    };
+    await transporter.sendMail(mailOptions);
     res.status(200).json({ message: 'Match accepted successfully an email was sent to you with the information of the object'});
   } catch (error) {
     errorHandler(res, error);
   }
 };
 
-// List Claimed Lost Objects (test)
+// List Claimed Lost Objects (not tested)
 exports.getClaimedLostObject = async (req, res) => {
   try {
     const ownerId = req.params.ownerid;
