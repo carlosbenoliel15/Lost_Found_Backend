@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/config');
 const { UserModel} = require('../models/User');
 const nodemailer = require('nodemailer');
+const { set } = require('mongoose');
 
 exports.login = async (req, res) => {
   try {
@@ -13,11 +14,14 @@ exports.login = async (req, res) => {
       userData = await authService.authenticateUserWithGoogle(clientId);
     } else {
      if(!req.body.time){
-      time = "1";
+        var time = Date();
+        time.setHours(time.getHours() + 1);
       }
       else{
-        time = req.body.time;
+        var time = Date();
+        time.setHours(time.getHours() + req.body.time); 
       }
+      
       userData = await authService.authenticateUser(email, password, time);
     }
     res.json(userData);

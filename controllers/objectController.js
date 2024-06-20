@@ -598,9 +598,6 @@ exports.getLostObjectByCats = async (req, res) => {
   }
 };
 
-
-
-
 // Accept (not tested)
 exports.acceptLostMatch = async (req, res) => {
   try {

@@ -5,7 +5,7 @@ const { JWT_SECRET } = require('../config/config');
 
 const authService = {
   // Função para autenticar um usuário
-  async authenticateUser(email, password,time) {
+  async authenticateUser(email, password, time) {
     try {
 
       const user = await UserModel.findOne({ email });
@@ -21,7 +21,7 @@ const authService = {
         throw new Error('Wrong credentials');
       }
       // Gere um token JWT para o usuário
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: time });
+      const token = jwt.sign({ userId: user._id , expiresIn: time}, JWT_SECRET);
     
 // Construa o objeto contendo o token e as informações do usuário
       const userData = {
