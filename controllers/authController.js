@@ -16,11 +16,15 @@ exports.login = async (req, res) => {
     } else {
      if(!req.body.time){
         var time = new Date();
-        time.setHours(time.getHours() + 1);
+        time.setHours(time.getHours() + 1);     
+        // time.setSeconds(time.getSeconds() + 1);
+
       }
       else{
         var time = new Date();
-        time.setHours(time.getHours() + req.body.time); 
+        time.setHours(time.getHours() + req.body.time);
+        //  time.setSeconds(time.getSeconds() + req.body.time); 
+
       }
 
       userData = await authService.authenticateUser(email, password, time);
