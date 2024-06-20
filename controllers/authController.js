@@ -6,6 +6,7 @@ const { UserModel} = require('../models/User');
 const nodemailer = require('nodemailer');
 const { set } = require('mongoose');
 
+
 exports.login = async (req, res) => {
   try {
     const { email, password, clientId } = req.body;
@@ -14,14 +15,14 @@ exports.login = async (req, res) => {
       userData = await authService.authenticateUserWithGoogle(clientId);
     } else {
      if(!req.body.time){
-        var time = Date();
+        var time = new Date();
         time.setHours(time.getHours() + 1);
       }
       else{
-        var time = Date();
+        var time = new Date();
         time.setHours(time.getHours() + req.body.time); 
       }
-      
+
       userData = await authService.authenticateUser(email, password, time);
     }
     res.json(userData);
