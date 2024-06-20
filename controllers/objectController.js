@@ -66,7 +66,7 @@ exports.createLostObject = async (req, res) => {
       objectImages= await uploadImages(req.files);
     }
 
-    const subCategory = JSON.parse(req.body.subCategory);
+    const subCategory = req.body.subCategory;
     const newLostObjectArgs = {
       owner: req.body.owner,
       category: category._id,
@@ -94,7 +94,7 @@ exports.createLostObject = async (req, res) => {
 
       const subSubCategoryAssociationCheck = await SubSubCategoryAssociationModel.findOne({ subCategory: new ObjectId(subCategoryCheck._id), subSubCategory: new ObjectId(subSubCategoryCheck._id) });
       if (!subSubCategoryAssociationCheck) {
-        return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and SubSubCategory ' + subCategory[key].subCategory + ' not associated'});
+        return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and subSubCategory ' + subCategory[key].subSubCategory + ' not associated'});
       }
 
       const subCategoryArgs = {
@@ -786,7 +786,8 @@ exports.createFoundObject = async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
     newFoundObjectData.category = category._id;
-    const subCategory = JSON.parse(req.body.subCategory);    const newFoundObject = new FoundObjectModel(newFoundObjectData);
+    const subCategory = req.body.subCategory;    
+    const newFoundObject = new FoundObjectModel(newFoundObjectData);
     for (const key in subCategory) {
       const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
       if (!subCategoryCheck) {
