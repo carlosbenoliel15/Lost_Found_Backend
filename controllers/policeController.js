@@ -85,6 +85,8 @@ exports.createPoliceOfficer = async (req, res) => {
       first_name: req.body.firstName,
       last_name: req.body.lastName,
       email: req.body.email,
+      nic: req.body.nif,
+      nif: req.body.nif,
       password: req.body.password,
       phone: req.body.phone,
       profileImage: req.body.profileImage,
