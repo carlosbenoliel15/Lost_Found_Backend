@@ -683,7 +683,7 @@ exports.acceptLostMatch = async (req, res) => {
 exports.getClaimedLostObject = async (req, res) => {
   try {
     const ownerId = req.params.ownerid;
-    const owner = await UserModel.findById(ownerId);
+    const owner = await OwnerModel.findById(ownerId);
     if (!owner) {
       return res.status(404).json({ error: 'Owner not found' });
     }
