@@ -3,7 +3,7 @@ const { BidderModel } = require('../models/User');
 
 const makeBid = async (req, res) => {
     try {
-        const { auction: auctionId, user: bidderData, value: bidValue } = req.body;
+        const { auction: auctionId, bidder: bidderData, value: bidValue } = req.body;
 
         const auction = await AuctionModel.findById(auctionId);
         if (!auction) {
