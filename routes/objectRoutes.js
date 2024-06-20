@@ -18,7 +18,8 @@ router.put('/lost-objects/:lostObjectId', objectController.updateLostObject);
 router.delete('/lost-objects/:lostObjectId', objectController.deleteLostObject);
 router.post('/match/',objectController.getLostMatch);
 router.get('/lost-objects/user/:id', objectController.getLostObjectByUserId);
-router.post ('/lost-objects/description/', objectController.getLostObjectByDescription);
+router.get('/lost-objects/categories/:catId/:subCatId/:subSubCatId', objectController.getLostObjectByCats);
+router.post('/lost-objects/description/', objectController.getLostObjectByDescription);
 router.put('/accept/', objectController.acceptLostMatch);
 router.put('/lost-objects/claim/:ownerid', objectController.getClaimedLostObject);
 

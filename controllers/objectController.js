@@ -536,6 +536,71 @@ exports.getLostObjectByDescription = async (req, res) => {
   }
 };
 
+// Get LostObjects by categories
+exports.getLostObjectByCats = async (req, res) => {
+  try {
+    const catId = req.params.catId;
+    const subCatId = req.params.subCatId;
+    const subSubCatId = req.params.subSubCatId;
+
+    let commonObjects = [];
+    let objIds = [];
+  
+    const objlist1 = await LostObjectModel.find({ category: catId }).lean(); 
+
+    if (subCatId && subSubCatId && subCatId !== "null" && subSubCatId !== "null") {
+      
+      const objCatlist = await ObjSubCategoryModel.find({ subCategory: subCatId, subSubCategory: subSubCatId }).lean();
+      objIds = objCatlist.map(item => item.object.toString()); 
+      commonObjects = objlist1.filter(obj => objIds.includes(obj._id.toString()));
+
+    } else {
+      commonObjects = objlist1;
+    }
+
+    const resArray = [];
+    for (const item of commonObjects) {
+      const resJson = {};
+      const categoryName = await CategoryModel.findById(item.category);
+
+      resJson.object_id = item._id;
+      resJson.owner = item.owner;
+      resJson.title = item.title;
+      resJson.description = item.description;
+      resJson.location = item.location;
+      resJson.price = item.price;
+      resJson.lostDate = item.lostDate;
+      resJson.status = item.status;
+      resJson.objectImage = item.objectImage;
+      resJson.category_id = categoryName._id;
+      resJson.category = categoryName.name;
+      resJson.coordinates = item.coordinates;
+
+      const subCategories = await ObjSubCategoryModel.find({ object: item._id }).lean();
+      const subCategoriesArray = [];
+      for (const item1 of subCategories) {
+        const subCategoryJson = {};
+        const subCategory = await SubCategoryModel.findById(item1.subCategory);
+        subCategoryJson.subCategory_id = subCategory._id;
+        subCategoryJson.subCategory = subCategory.name;
+        subCategoryJson.subSubCategory_id = item1.subSubCategory;
+        const subSubCategory = await SubSubCategoryModel.findById(item1.subSubCategory);
+        subCategoryJson.subSubCategoryName = subSubCategory.name;
+        subCategoriesArray.push(subCategoryJson);
+      }
+      resJson.subCategories = subCategoriesArray;
+      resArray.push(resJson);
+    }
+
+    res.status(200).json(resArray);
+  } catch (error) {
+    errorHandler(res, error);
+  }
+};
+
+
+
+
 // Accept (not tested)
 exports.acceptLostMatch = async (req, res) => {
   try {
