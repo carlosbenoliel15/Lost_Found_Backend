@@ -51,7 +51,7 @@ return userData;
   },
 
   // Function to authenticate a user with Google client ID
-  async authenticateUserWithGoogle(clientId) {
+  async authenticateUserWithGoogle(clientId, time) {
     try {
       const user = await UserModel.findOne({ googleId: clientId });
       if (!user) {
@@ -64,7 +64,7 @@ return userData;
 
 
       // Generate a JWT token for the user
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ userId: user._id, expiresIn: time }, JWT_SECRET);
 
       // Construct the object containing the token and user information
       const userData = {

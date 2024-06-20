@@ -11,18 +11,19 @@ exports.login = async (req, res) => {
   try {
     const { email, password, clientId } = req.body;
     let userData;
-    if (clientId) {
-      userData = await authService.authenticateUserWithGoogle(clientId);
-    } else {
-     if(!req.body.time){
-        var time = new Date();
-        time.setHours(time.getHours() + 1);
-      }
-      else{
-        var time = new Date();
-        time.setHours(time.getHours() + req.body.time); 
-      }
 
+    if(!req.body.time){
+      var time = new Date();
+      time.setHours(time.getHours() + 2);
+    }
+    else{
+      var time = new Date();
+      time.setHours(time.getHours() + req.body.time); 
+    }
+
+    if (clientId) {
+      userData = await authService.authenticateUserWithGoogle(clientId,time);
+    } else {
       userData = await authService.authenticateUser(email, password, time);
     }
     res.json(userData);
