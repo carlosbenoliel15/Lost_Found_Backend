@@ -3,9 +3,15 @@ const router = express.Router();
 const authController = require('../controllers/auctionController');
 const bidController = require('../controllers/bidController');
 
-// Passar o objeto io para o controlador de leilão
+// Pass the io object to the bid controller
 const auctionRoutes = (io) => {
-    // Rotas do leilão
+    // Middleware to attach io to req
+    router.use((req, res, next) => {
+        req.io = io;
+        next();
+    });
+
+    // Auction routes
     router.post('/', authController.createAuction);
     router.get('/', authController.getAllAuctions);
     router.get('/:id', authController.getAuctionById);
@@ -16,10 +22,11 @@ const auctionRoutes = (io) => {
     router.put('/:id/end', authController.endAuction);
     router.get('/where/:id', authController.whereIsAuction);
 
-    // Rotas de lances para leilão
-    router.post('/:id/makeBid', bidController.makeBid);
+    // Bid routes for auction
+    router.post('/makeBid', bidController.makeBid);
     router.get('/:id/bids', bidController.getAllBidsByAuctionId);
     router.get('/:id/bid', bidController.getCurrentBidByAuctionId);
+
     return router;
 }
 

@@ -1,64 +1,83 @@
 const { AuctionModel, BidModel } = require('../models/Auction');
 const { BidderModel } = require('../models/User');
 
-const errorHandler = (res, error) => {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-};
-
-exports.makeBid = async (req, res) => {
+const makeBid = async (req, res) => {
     try {
-        const auction = await AuctionModel.findById(req.body.auction);
+        const { auction: auctionId, bidder: bidderData, value: bidValue } = req.body;
 
-        const bidder = await BidderModel.findById(req.body.bidder);
-        if (!bidder) {
-            const newBidder = new BidderModel(req.body.bidder);
-            await newBidder.save();
-            req.body.bidder = newBidder._id;
-        }
-
-        const bid = new BidModel(req.body);
-        console.log(bid);
-        const auctionId = bid.auction;
-        const bidderId = bid.bidder;
-        const value = bid.value;
-
+        const auction = await AuctionModel.findById(auctionId);
         if (!auction) {
             return res.status(400).json({ error: "Auction not found" });
-        } else if (auction.status === "Closed") {
+        }
+
+        if (auction.status === "Closed") {
             return res.status(400).json({ error: "Auction is closed" });
         }
-
-        const currentBid = await BidModel.find({ auction: auctionId }).sort({ value: -1 });
-        let maxBid = null;
-        if (currentBid.length > 0) {
-            maxBid = currentBid[0].value;
-            if (maxBid >= value) {
-                return res.status(400).json({ error: "Bid must be higher than current bid" });
-            }
+        
+        let bidder = await BidderModel.findOne({user: bidderData});
+        console.log(bidderData)
+        if (!bidder) {
+            console.log(bidderData)
+            bidder = new BidderModel({ user: bidderData});
+            await bidder.save();
+            
         }
 
-        await bid.save();
+        const existingBids = await BidModel.find({ auction: auctionId }).sort({ value: -1 });
+        const maxBidValue = existingBids.length > 0 ? existingBids[0].value : 0;
 
-        // Emit the new bid to all clients connected to this auction
-        const io = req.app.get('io');
+        if (maxBidValue >= bidValue) {
+            return res.status(400).json({ error: "Bid must be higher than current bid" });
+        }
+
+        const newBid = new BidModel({
+            auction: auctionId,
+            bidder: bidder._id,
+            value: bidValue
+        });
+
+        await newBid.save();
+
+        const io = req.io; 
         io.to(auctionId).emit('newBid', {
-            auctionId: auctionId,
-            userId: bidderId,
-            bidValue: value
+            auctionId,
+            userId: bidder._id,
+            bidValue
         });
 
-        
         io.to(auctionId).emit('newMaxBid', {
-            auctionId: auctionId,
-            maxBid: maxBid || value  
+            auctionId,
+            maxBid: bidValue
         });
 
-        return res.status(200).json(bid);
+        return res.status(200).json(newBid);
     } catch (error) {
         return res.status(400).json({ error: "Could not make bid" });
     }
 };
+
+const getAllBidsByAuctionId = async (req, res) => {
+    try {
+        const bids = await BidModel.find({ auction: req.params.id }).sort({ value: -1 });
+        return res.status(200).json(bids);
+    } catch (error) {
+        return res.status(400).json({ error: "Could not retrieve bids" });
+    }
+};
+
+const getCurrentBidByAuctionId = async (req, res) => {
+    try {
+        const currentBid = await BidModel.findOne({ auction: req.params.id }).sort({ value: -1 });
+        return res.status(200).json(currentBid);
+    } catch (error) {
+        return res.status(400).json({ error: "Could not retrieve current bid" });
+    }
+};
+
+module.exports = { makeBid, getAllBidsByAuctionId, getCurrentBidByAuctionId };
+
+
+
 
 
 //get all bids for auction
