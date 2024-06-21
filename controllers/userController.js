@@ -132,6 +132,15 @@ exports.updateUserById = async (req, res) => {
   }
 };
 
+exports.listUsers = async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // Function to update user password with the provided ID
 exports.updatePassById = async (req, res) => {
   try {
@@ -238,7 +247,6 @@ exports.getUserData = async (req, res) => {
   }
 };
 
-
 exports.getUserByNIF = async (req, res) => {
   try {
     const userNif = req.params.nif; 
@@ -251,7 +259,6 @@ exports.getUserByNIF = async (req, res) => {
     return res.status(500).json({ error: `Server error when trying to fetch users. ` + err });
   }
 };
-
 
 exports.getProfileImage = async (req, res) => {
 
