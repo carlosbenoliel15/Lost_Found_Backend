@@ -2,6 +2,7 @@ const {AuctionModel, BidModel} = require('../models/Auction');
 const {UserModel, BidderModel, PoliceOfficerModel} = require('../models/User');
 const {FoundObjectModel} = require('../models/Object');
 const {PoliceStationModel} = require('../models/Police');
+const { ServerDescription } = require('mongodb');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 const errorHandler = (res, error) => {
@@ -59,6 +60,9 @@ exports.getAllAuctions = async (req, res) => {
                 foundObjectTitle: foundObject.title, 
                 highestBid: highestBid,
                 bids: bids,
+                location:foundObject.location,
+                price: foundObject.price,
+                description:foundObject.description,
                 objectImage: foundObject.objectImage
             });
         }
