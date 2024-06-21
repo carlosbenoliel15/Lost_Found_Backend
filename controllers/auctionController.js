@@ -62,6 +62,7 @@ exports.getAllAuctions = async (req, res) => {
                 bids: bids,
                 location:foundObject.location,
                 price: foundObject.price,
+                coordinates:foundObject.coordinates,
                 description:foundObject.description,
                 objectImage: foundObject.objectImage
             });
