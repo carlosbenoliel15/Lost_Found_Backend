@@ -264,10 +264,14 @@ exports.getProfileImage = async (req, res) => {
 
   try {
     const publicId = req.params.id;
-    const image = await cloudinaryService.getImage("profileImages/"+publicId);
-
-    if (!image) {
-      return res.status(404).json({ error: 'Image not found' });
+    let image;
+    if (publicId !== 'null') {
+      image = await cloudinaryService.getImage("profileImages/"+publicId);
+      if (!image) {
+        return res.status(404).json({ error: 'Image not found' });
+      }
+    } else {
+      image= "https://res.cloudinary.com/dkyu0tmfx/image/upload/v1715205192/profileImages/profile_1_i39bhb.png"
     }
     return res.status(200).json({ image });
   }catch (err) {

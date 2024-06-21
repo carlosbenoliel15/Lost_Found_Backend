@@ -1,36 +1,33 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const nodemailer = require('nodemailer');
 const {AuctionModel, BidModel, PaymentModel} = require('../models/Auction');
 const {BidderModel} = require('../models/User');
 
 
 exports.payment = async (req, res) => {
+    const product = req.body;
     const session = await stripe.checkout.sessions.create({
-        // line_items: [
-        //   //product data
-        //   {
-        //     price_data: {
-        //         //price currency
-        //         currency: 'usd',
-        //         //product data
-        //         product_data: {
-        //             //product name
-        //             name: 'T-shirt',
-        //         },
-        //         //price in cents
-        //         unit_amount: 2000,
-        //     },
-        //     quantity: 1,
-        //   },
-        // ],
-        line_items: req.body,
+        payment_method_types: ['card', "paypal"],
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              product_data: {
+                name: product.name,
+                  images: [product.image],
+              },
+              unit_amount: Math.round(product.price * 100),
+            },
+            quantity: 1,
+          },
+        ],
         mode: 'payment',
-        success_url: `${YOUR_DOMAIN}/success`,
-        cancel_url: `${YOUR_DOMAIN}/cancel`,
-      });
-    
-      res.send({url: session.url});
-};
+        success_url: 'http://localhost:3001/auctions',
+        cancel_url: 'http://localhost:3001',
+    });
+
+    res.json({ id: session.id });
+}
 
 exports.webhook = async (req, res) => {
   const event = request.body;
@@ -105,7 +102,7 @@ exports.createPaymentInfo = async (req, res) => {
             return res.status(400).json({error: "Auction is closed but no winner bid not found"});
         }
 
-        const bid = await BidModel.findById(auction.winnerBid); 
+        const bid = await BidModel.findById(auction.winnerBid);
 
         const bidder = await BidderModel.findById(req.body.paymentUser);
         if (!bidder){
@@ -147,7 +144,7 @@ exports.getPaymentInfoByUser = async (req, res) => {
             return res.status(400).json({error: "Payment info not found"});
         }
 
-        
+
         res.status(200).json(payments);
     }
     catch (error) {
