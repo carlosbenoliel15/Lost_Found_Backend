@@ -94,7 +94,7 @@ exports.getAuctionById = async (req, res) => {
 //update auction by id
 exports.updateAuctionById = async (req, res) => {
     try{
-        const auction = await AuctionModel.findOne(req.params.id);
+        const auction = await AuctionModel.findById(req.params.id);
         if (!auction){
             return res.status(400).json({error: "Auction not found"});
         }
@@ -110,7 +110,7 @@ exports.updateAuctionById = async (req, res) => {
         const updatedAuction = await AuctionModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
         return res.status(200).json(updatedAuction);
     } catch (error){
-        return res.status(400).json({error: "Could not update auction"});
+        return res.status(400).json({error: error.message});
     }
 }
 
