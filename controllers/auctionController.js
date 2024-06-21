@@ -4,6 +4,7 @@ const {FoundObjectModel} = require('../models/Object');
 const {PoliceStationModel} = require('../models/Police');
 const { ServerDescription } = require('mongodb');
 const ObjectId = require('mongoose').Types.ObjectId;
+const nodemailer = require('nodemailer');
 
 const errorHandler = (res, error) => {
     console.error('Error:', error);
@@ -211,55 +212,56 @@ exports.endAuction = async (req, res) => {
             auction.winnerBid = winnerbid;
 
             const found = await FoundObjectModel.findById(auction.foundObject);
-            found.claimant = winner;
-            await found.save();
-            await auction.save();
-
+            
             if (winner != null){
-                const user = await UserModel.findById(winner.user);
+                const bidder = await BidderModel.findById(winner);
+                const user = await UserModel.findById(bidder.user);
                 if (!user){
                     return res.status(400).json({error: "User not found"});
                 }
-
+                found.claimant = winner;
+                
                 let transporter = nodemailer.createTransport({
-                    service: 'gmail', // or use another email service
-                    auth: {
-                      user: process.env.EMAIL_ADDRESS,
-                      pass: process.env.EMAIL_PASSWORD
-                    }
-                });
-
-                var text = `Hi ${user.first_name} ${user.last_name},\nCongratulations! You have won the auction for the object ${found.title}! Please go and pay the item.`;
+                        service: 'gmail',
+                        auth: {
+                              user: process.env.EMAIL_ADDRESS,
+                              pass: process.env.EMAIL_PASSWORD
+                            }
+                        });
+                        
+                        var text = `Hi ${user.first_name} ${user.last_name},\nCongratulations! You have won the auction for the object ${found.title}! Please go and pay the item.`;
                 var line1 = `Hi ${user.first_name} ${user.last_name},`;
                 var line2 = `Congratulations! You have won the auction for the object ${found.title}!`;
                 var line3 = `Please go and pay the item.`;
-
+                
                 let mailOptions = {
-                    from: "no-reply@bidfinder.ddns.net",
-                    to: user.email,
-                    subject: "Auction status",
-                    text: text,
+                        from: "no-reply@bidfinder.ddns.net",
+                        to: user.email,
+                        subject: "Auction status",
+                        text: text,
                     html: `
                     <p>${line1}</p>
                     <p>${line2}</p>
                     <p>${line3}</p>
                     <img src="cid:unique@icon.cid" alt="Icon" />`,
                     attachments: [
-                        {
-                            filename: 'icon.png',
-                            path: 'logo.png',
-                            cid: 'unique@icon.cid'
-                        }
-                    ]
-                };
-                await transporter.sendMail(mailOptions);
-            }
-            
-        }
-
+                            {
+                                    filename: 'icon.png',
+                                    path: 'logo.png',
+                                    cid: 'unique@icon.cid'
+                                }
+                            ]
+                        };
+                        await transporter.sendMail(mailOptions);
+                    }
+                    
+                    await found.save();
+                    await auction.save();
+                }
+                
         return res.status(200).json(auction);
     } catch (error){
-        return res.status(400).json({error: "Could not end auction"});
+        return res.status(400).json({error: error.message});
     }
 }
 
