@@ -66,7 +66,7 @@ exports.createLostObject = async (req, res) => {
       objectImages= await uploadImages(req.files);
     }
 
-    const subCategory = req.body.subCategory;
+    const subCategory = JSON.parse(req.body.subCategory);
     const newLostObjectArgs = {
       owner: req.body.owner,
       category: category._id,
