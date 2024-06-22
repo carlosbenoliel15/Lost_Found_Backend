@@ -132,7 +132,7 @@ exports.getAllLostObjects = async (req, res) => {
       resJson.price = item.price;
       resJson.lostDate = item.lostDate;
       resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
+      resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
       resJson.coordinates = item.coordinates;
@@ -177,7 +177,7 @@ exports.getLostObjectById = async (req, res) => {
     resJson.price = lostObject.price;
     resJson.lostDate = lostObject.lostDate;
     resJson.status = lostObject.status;
-    resJson.objectImage = lostObject.objectImage;
+    resJson.objectImage = lostObject.objectImage.length===0 ? ["default_obj_ht0fde"] : lostObject.objectImage;
     resJson.category_id = categoryName._id;
     resJson.category = categoryName.name;
     resJson.coordinates = lostObject.coordinates;
@@ -257,7 +257,7 @@ exports.getLostMatch = async (req, res) => {
     lostJsonObject.price = lostObject.price;
     lostJsonObject.lostDate = lostObject.lostDate;
     lostJsonObject.status = lostObject.status;
-    lostJsonObject.objectImage = lostObject.objectImage;
+    lostJsonObject.objectImage = lostObject.objectImage.length===0 ? ["default_obj_ht0fde"] : lostObject.objectImage;
     lostJsonObject.category_id = categoryName._id;
     lostJsonObject.category = categoryName.name;
 
@@ -296,7 +296,7 @@ exports.getLostMatch = async (req, res) => {
       foundJson.foundDate = item.foundDate;
       foundJson.endDate = item.endDate;
       foundJson.status = item.status;
-      foundJson.objectImage = item.objectImage;
+      foundJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       foundJson.category_id = categoryName._id;
       foundJson.category = categoryName.name;
 
@@ -446,7 +446,7 @@ exports.getLostObjectByUserId = async (req, res) => {
       resJson.price = item.price;
       resJson.lostDate = item.lostDate;
       resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
+      resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
       resJson.coordinates = item.coordinates;
@@ -501,7 +501,7 @@ exports.getLostObjectByDescription = async (req, res) => {
         resJson.price = item.price;
         resJson.lostDate = item.lostDate;
         resJson.status = item.status;
-        resJson.objectImage = item.objectImage;
+        resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
         resJson.similarity = response.data.similarity;
         resJson.category_id = categoryName._id;
         resJson.category = categoryName.name;
@@ -571,7 +571,7 @@ exports.getLostObjectByCats = async (req, res) => {
       resJson.price = item.price;
       resJson.lostDate = item.lostDate;
       resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
+      resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
       resJson.coordinates = item.coordinates;
@@ -703,7 +703,7 @@ exports.getClaimedLostObject = async (req, res) => {
       resJson.price = item.price;
       resJson.lostDate = item.lostDate;
       resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
+      resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
       resJson.coordinates = item.coordinates;
@@ -841,7 +841,7 @@ exports.getAllFoundObjects = async (req, res) => {
       resJson.foundDate = item.foundDate;
       resJson.endDate = item.endDate;
       resJson.status = item.status;
-      resJson.objectImage = item.objectImage;
+      resJson.objectImage = item.objectImage.length===0 ? ["default_obj_ht0fde"] : item.objectImage;
       resJson.category_id = categoryName._id;
       resJson.category = categoryName.name;
       resJson.coordinates = item.coordinates;
@@ -889,7 +889,7 @@ exports.getFoundObjectById = async (req, res) => {
     resJson.foundDate = foundObject.foundDate;
     resJson.endDate = foundObject.endDate;
     resJson.status = foundObject.status;
-    resJson.objectImage = foundObject.objectImage;
+    resJson.objectImage = foundObject.objectImage.length==0 ? ["default_obj_ht0fde"] : foundObject.objectImage;
     resJson.category_id = categoryName._id;
     resJson.category = categoryName.name;
     resJson.coordinates = foundObject.coordinates;

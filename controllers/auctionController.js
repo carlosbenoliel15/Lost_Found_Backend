@@ -65,7 +65,7 @@ exports.getAllAuctions = async (req, res) => {
                 price: foundObject.price,
                 coordinates:foundObject.coordinates,
                 description:foundObject.description,
-                objectImage: foundObject.objectImage
+                objectImage: foundObject.objectImage.length==0 ? ["default_obj_ht0fde"] : foundObject.objectImage
             });
         }
 
