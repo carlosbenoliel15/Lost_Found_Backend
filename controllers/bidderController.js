@@ -79,3 +79,17 @@ exports.getPurchasedObjectsByBidder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getBidderUser=  async(req, res) => {
+  try {
+    const userId = req.params.userId;
+    const bidder = await BidderModel.findOne({ user: userId });
+    if (!bidder) {
+      return res.status(404).json({ message: 'Bidder not found' });
+    }
+    res.json(bidder);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
