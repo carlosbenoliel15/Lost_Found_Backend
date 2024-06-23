@@ -371,17 +371,21 @@ exports.getLostMatch = async (req, res) => {
       const subCategoriesFound = foundArray[i].subCategories;
       var subCategoryEqualNumber = 0;
       var subCategorySimilarity = 0;
-      for (var j=0; j<subCategoriesLost.length; j++){
-        if (subCategoriesLost[j].subCategory === subCategoriesFound[j].subCategory){
-          subCategoryEqualNumber++;
-          var subSimilarity = 0;
-          if (subCategoriesLost[j].subSubCategoryName.toLowerCase() === subCategoriesFound[j].subSubCategoryName.toLowerCase()){
-            subSimilarity = 1;
+
+      console.log(subCategoriesFound);
+      if (subCategoriesFound.length != 0){
+        for (var j=0; j < subCategoriesLost.length; j++){
+          if (subCategoriesLost[j].subCategory === subCategoriesFound[j].subCategory){
+            subCategoryEqualNumber++;
+            var subSimilarity = 0;
+            if (subCategoriesLost[j].subSubCategoryName.toLowerCase() === subCategoriesFound[j].subSubCategoryName.toLowerCase()){
+              subSimilarity = 1;
+            }
+            subCategorySimilarity += subSimilarity;
           }
-          subCategorySimilarity += subSimilarity;
         }
+        subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
       }
-      subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
 
       //compare the price
       var priceSimilarity = 0;
@@ -404,7 +408,7 @@ exports.getLostMatch = async (req, res) => {
       }
 
       //reject the found objects that have a similarity less than 1%
-      if (totalSimilarity >= 0.01){
+      if (totalSimilarity >= 1){
         resultArray.push(foundArray[i]);
       }
     }
