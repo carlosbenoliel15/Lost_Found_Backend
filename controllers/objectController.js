@@ -371,20 +371,23 @@ exports.getLostMatch = async (req, res) => {
       const subCategoriesFound = foundArray[i].subCategories;
       var subCategoryEqualNumber = 0;
       var subCategorySimilarity = 0;
-
-      console.log(subCategoriesFound);
       if (subCategoriesFound.length != 0){
         for (var j=0; j < subCategoriesLost.length; j++){
           if (subCategoriesLost[j].subCategory === subCategoriesFound[j].subCategory){
             subCategoryEqualNumber++;
             var subSimilarity = 0;
-            if (subCategoriesLost[j].subSubCategoryName.toLowerCase() === subCategoriesFound[j].subSubCategoryName.toLowerCase()){
+            if (subCategoriesLost[j].subSubCategoryName === subCategoriesFound[j].subSubCategoryName){
               subSimilarity = 1;
             }
             subCategorySimilarity += subSimilarity;
           }
         }
-        subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
+        if (subCategoryEqualNumber != 0){
+          subCategorySimilarity = (subCategorySimilarity/subCategoryEqualNumber) * subCategoryWeight;
+        }
+        else{
+          subCategorySimilarity = 0;
+        }
       }
 
       //compare the price
@@ -412,9 +415,9 @@ exports.getLostMatch = async (req, res) => {
         resultArray.push(foundArray[i]);
       }
     }
-    res.status(200).json(resultArray);
+    return res.status(200).json(resultArray);
   } catch (error) {
-    errorHandler(res, error);
+    return errorHandler(res, error);
   }
 };
 
