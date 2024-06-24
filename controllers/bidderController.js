@@ -82,7 +82,7 @@ exports.getPurchasedObjectsByBidder = async (req, res) => {
 
 exports.getBidderUser=  async(req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params.bidderId;
     const bidder = await BidderModel.findOne({ user: userId });
     if (!bidder) {
       return res.status(404).json({ message: 'Bidder not found' });

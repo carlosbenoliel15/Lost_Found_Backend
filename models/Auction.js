@@ -25,8 +25,7 @@ const PaymentSchema = new mongoose.Schema({
   paymentUser: { type: mongoose.Schema.Types.ObjectId, ref: 'Bidder', required:true},
   paymentAuction: { type: mongoose.Schema.Types.ObjectId, ref: 'Auction', required:true},
   paymentValue: Number,
-  paymentDate: Date,
-  paymentStatus: { type: String, enum: ['Paid', 'Not Paid'], default: 'Not Paid' }
+  paymentDate: Date
 });
 
 const PaymentModel = mongoose.model('Payment', PaymentSchema);

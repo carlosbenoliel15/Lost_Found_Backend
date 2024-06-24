@@ -55,10 +55,10 @@ exports.getAllAuctions = async (req, res) => {
             resList.push({
                 _id: auction._id,
                 foundObject: foundObject._id,
-                startDate: auction.startDate, 
+                startDate: auction.startDate,
                 endDate: auction.endDate,
                 status: auction.status,
-                foundObjectTitle: foundObject.title, 
+                foundObjectTitle: foundObject.title,
                 highestBid: highestBid,
                 bids: bids,
                 location:foundObject.location,
@@ -68,10 +68,6 @@ exports.getAllAuctions = async (req, res) => {
                 objectImage: foundObject.objectImage.length==0 ? ["default_obj_ht0fde"] : foundObject.objectImage
             });
         }
-
-
-
-
         return res.status(200).json(resList);
     } catch (error){
         return res.status(400).json({error: error.message});
@@ -151,8 +147,15 @@ exports.getAllAuctionsByUserId = async (req, res) => {
         var auctions = [];
         for (var i = 0; i < bids.length; i++){
             const auction = await AuctionModel.findOne(bids[i].auction);
-            if (auction && !auctions.includes(auction)) {
-                auctions.push(auction);
+            const auctionCopy = Object.assign({}, auction)._doc;
+            if (auctionCopy && !auctions.includes(auction)) {
+
+                auctionCopy["bid"] = bids[i]._id;
+                auctionCopy["value"] = bids[i].value;
+                if (!!auctionCopy.winnerBid) {
+                    auctionCopy["winnerBidder"] = bids[i].bidder
+                }
+                auctions.push(auctionCopy);
             }
         }
         if (!auctions) {
