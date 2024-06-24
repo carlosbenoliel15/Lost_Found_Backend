@@ -23,7 +23,7 @@ const BidModel = mongoose.model('Bid', BidSchema);
 // Schema para Payment
 const PaymentSchema = new mongoose.Schema({
   paymentUser: { type: mongoose.Schema.Types.ObjectId, ref: 'Bidder', required:true},
-  paymentAuction: { type: mongoose.Schema.Types.ObjectId, ref: 'Auction', required:true, unique: true},
+  paymentAuction: { type: mongoose.Schema.Types.ObjectId, ref: 'Auction', required:true},
   paymentValue: Number,
   paymentDate: Date
 });
