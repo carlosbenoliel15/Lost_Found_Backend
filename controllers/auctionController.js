@@ -232,7 +232,7 @@ exports.endAuction = async (req, res) => {
                             }
                         });
                         
-                        var text = `Hi ${user.first_name} ${user.last_name},\nCongratulations! You have won the auction for the object ${found.title}! Please go and pay the item.`;
+                var text = `Hi ${user.first_name} ${user.last_name},\nCongratulations! You have won the auction for the object ${found.title}! Please go and pay the item.`;
                 var line1 = `Hi ${user.first_name} ${user.last_name},`;
                 var line2 = `Congratulations! You have won the auction for the object ${found.title}!`;
                 var line3 = `Please go and pay the item.`;
