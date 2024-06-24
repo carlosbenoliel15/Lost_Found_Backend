@@ -115,7 +115,6 @@ exports.sendEmail = async (req, res) => {
 exports.createPaymentInfo = async (req, res) => {
     try {
         const auctionId = jwt.decode(req.body.auctionId)?.auctionId
-        console.log("AAAAA", auctionId)
         const auction = await AuctionModel.findById(auctionId);
         const auctionWinnerBid = await BidModel.findById(auction.winnerBid);
         const paymentObject = {
