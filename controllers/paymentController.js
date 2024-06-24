@@ -1,9 +1,11 @@
 const stripe = require('stripe')(process.env.STRIPE_API_KEY);
 const nodemailer = require('nodemailer');
 const {AuctionModel, BidModel, PaymentModel} = require('../models/Auction');
-const {BidderModel} = require('../models/User');
+const {BidderModel, OwnerModel, UserModel, PoliceOfficerModel} = require('../models/User');
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET} = require("../config/config");
+const {LostObjectModel, FoundObjectModel} = require("../models/Object");
+const {PoliceStationModel} = require("../models/Police");
 
 
 exports.payment = async (req, res) => {
@@ -122,6 +124,8 @@ exports.createPaymentInfo = async (req, res) => {
             paymentAuction: auctionId,
             paymentValue: auctionWinnerBid.value
         }
+        const bidder = await BidderModel.findById(auctionWinnerBid.bidder);
+
         const paymentVerify = await PaymentModel.findOne(paymentObject);
         if (paymentVerify){
             return res.status(400).json({error: "Payment already exists"});
@@ -137,17 +141,70 @@ exports.createPaymentInfo = async (req, res) => {
             return res.status(400).json({error: "Auction is closed but no winner bid not found"});
         }
 
-        const bid = await BidModel.findById(auction.winnerBid);
 
-        const bidder = await BidderModel.findById(req.body.paymentUser);
         if (!auctionWinnerBid.bidder){
             return res.status(400).json({error: "Bidder not found"});
         }
 
-        console.log(paymentObject)
 
         const payment = new PaymentModel(paymentObject);
         await payment.save();
+
+        const foundObject = await FoundObjectModel.findById(auction.foundObject);
+        if (!foundObject) {
+            return res.status(404).json({ error: 'FoundObject not found' });
+        }
+
+        const user = await UserModel.findById(bidder.user);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const policeOfficer = await PoliceOfficerModel.findById(foundObject.policeOfficerThatReceived);
+        if (!policeOfficer) {
+            return res.status(404).json({ error: 'PoliceOfficer not found' });
+        }
+        const policeStation = await PoliceStationModel.findById(policeOfficer.station);
+        if (!policeStation) {
+            return res.status(404).json({ error: 'PoliceStation not found' });
+        }
+
+        //send an email to the owner of the lost object
+        let transporter = nodemailer.createTransport({
+            service: 'gmail', // or use another email service
+            auth: {
+                user: process.env.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+
+        var text = `Hi ${user.first_name} ${user.last_name},\n Your payment was successful for the delivered object ${foundObject.title}.\nGo to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back. Present this code: \nFound Object: ${foundObject._id}`;
+        var line1 = `Hi ${user.first_name} ${user.last_name},`
+        var line2 = `Your payment was successful for the delivered object ${foundObject.title}.`
+        var line3 = `Go to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back.`
+        var line4 = `Present this code:`
+        var line5 = `Found Object: ${foundObject._id}`
+
+        let mailOptions = {
+            from: "no-reply@bidfinder.ddns.net",
+            to: user.email,
+            subject: "Match accepted",
+            text: text,
+            html: `
+      <p>${line1}</p>
+      <p>${line2}</p>
+      <p>${line3}</p>
+      <p>${line4}</p>
+      <p>${line5}</p>
+      <img src="cid:unique@icon.cid" alt="Icon" />`,
+            attachments: [
+                {
+                    filename: 'icon.png',
+                    path: 'logo.png',
+                    cid: 'unique@icon.cid'
+                }
+            ]
+        };
+        await transporter.sendMail(mailOptions);
         res.status(200).json({message: "Payment info created"});
     } catch (error) {
         console.log(error)
