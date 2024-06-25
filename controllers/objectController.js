@@ -610,79 +610,87 @@ exports.acceptLostMatch = async (req, res) => {
   try {
     const lostObjectId = req.body.lostObjectId;
     const foundObjectId = req.body.foundObjectId;
-    console.log(lostObjectId);
-    console.log(foundObjectId);
+
     const lostObject = await LostObjectModel.findById(lostObjectId);
     if (!lostObject) {
       return res.status(404).json({ error: 'LostObject not found' });
     }
+
     const foundObject = await FoundObjectModel.findById(foundObjectId);
     if (!foundObject) {
       return res.status(404).json({ error: 'FoundObject not found' });
     }
-    lostObject.status = 'accepted';
-    foundObject.status = 'accepted';
-    foundObject.claimant = lostObject.owner;
-    await lostObject.save();
-    await foundObject.save();
+
 
     const owner = await OwnerModel.findById(lostObject.owner);
     if (!owner) {
       return res.status(404).json({ error: 'Owner not found' });
     }
+
     const user = await UserModel.findById(owner.user);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    const policeOfficer = await PoliceOfficerModel.findById(foundObject.policeOfficerThatReceived);
-    if (!policeOfficer) {
-      return res.status(404).json({ error: 'PoliceOfficer not found' });
-    }
-    const policeStation = await PoliceStationModel.findById(policeOfficer.station);
-    if (!policeStation) {
-      return res.status(404).json({ error: 'PoliceStation not found' });
-    }
-    
-    //send an email to the owner of the lost object
-    let transporter = nodemailer.createTransport({
-      service: 'gmail', // or use another email service
-      auth: {
-        user: process.env.EMAIL_ADDRESS,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    });
 
-    var text = `Hi ${user.first_name} ${user.last_name},\n You accepected the match with delivered object ${foundObject.title}.\nGo to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back. Present this codes: \nFound Object: ${foundObject._id}\nLost Object: ${lostObject._id}`;  
-    var line1 = `Hi ${user.first_name} ${user.last_name},`
-    var line2 = `You accepected the match with delivered object ${foundObject.title}.`
-    var line3 = `Go to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back.`
-    var line4 = `Present this codes:`
-    var line5 = `Found Object: ${foundObject._id}`
-    var line6 = `Lost Object: ${lostObject._id}`
+    lostObject.status = 'Claimed';
+    foundObject.status = 'Claimed';
+    foundObject.claimant = user._id;
+    await lostObject.save();
+    await foundObject.save();
 
-    let mailOptions = {
-      from: "no-reply@bidfinder.ddns.net",
-      to: user.email,
-      subject: "Match accepted",
-      text: text,
-      html: `
-      <p>${line1}</p>
-      <p>${line2}</p>
-      <p>${line3}</p>
-      <p>${line4}</p>
-      <p>${line5}</p>
-      <p>${line6}</p>
-      <img src="cid:unique@icon.cid" alt="Icon" />`,
-      attachments: [
+
+
+
+
+    // Attempt to send an email to the owner of the lost object
+    try {
+
+      let transporter = nodemailer.createTransport({
+        service: 'gmail', // or use another email service
+        auth: {
+          user: process.env.EMAIL_ADDRESS,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+
+      var text = `Hi ${user.first_name} ${user.last_name},\n You accepted the match with delivered object ${foundObject.title}.\nGo to ${policeStation.name}, ${policeStation.address}, ${policeStation.zip_code} to get your object back. Present these codes: \nFound Object: ${foundObject._id}\nLost Object: ${lostObject._id}`;  
+      var line1 = `Hi ${user.first_name} ${user.last_name},`
+      var line2 = `You accepted the match with delivered object ${foundObject.title}.`
+      var line3 = `Go to the  police Station to get your object back.`
+      var line4 = `Present these codes:`
+      var line5 = `Found Object: ${foundObject._id}`
+      var line6 = `Lost Object: ${lostObject._id}`
+
+      let mailOptions = {
+        from: "no-reply@bidfinder.ddns.net",
+        to: user.email,
+        subject: "Match accepted",
+        text: text,
+        html: `
+          <p>${line1}</p>
+          <p>${line2}</p>
+          <p>${line3}</p>
+          <p>${line4}</p>
+          <p>${line5}</p>
+          <p>${line6}</p>
+          <img src="cid:unique@icon.cid" alt="Icon" />`,
+        attachments: [
           {
-              filename: 'icon.png',
-              path: 'logo.png',
-              cid: 'unique@icon.cid'
+            filename: 'icon.png',
+            path: 'logo.png',
+            cid: 'unique@icon.cid'
           }
-      ]
-    };
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Match accepted successfully an email was sent to you with the information of the object'});
+        ]
+      };
+
+      await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+    }
+
+    // Respond with success even if the email sending fails
+    res.status(200).json({ message: 'Match accepted successfully. An email was sent to you with the information of the object.' });
+
   } catch (error) {
     errorHandler(res, error);
   }
