@@ -610,6 +610,8 @@ exports.acceptLostMatch = async (req, res) => {
   try {
     const lostObjectId = req.body.lostObjectId;
     const foundObjectId = req.body.foundObjectId;
+    console.log(lostObjectId);
+    console.log(foundObjectId);
     const lostObject = await LostObjectModel.findById(lostObjectId);
     if (!lostObject) {
       return res.status(404).json({ error: 'LostObject not found' });
