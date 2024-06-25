@@ -758,6 +758,7 @@ exports.createFoundObject = async (req, res) => {
     if (req.files) {
       objectImages= await uploadImages(req.files);
     }
+
     const newFoundObjectData = {
       userWhoFound: req.body.userWhoFound,
       policeOfficerThatReceived: req.body.policeOfficerThatReceived,
@@ -803,31 +804,33 @@ exports.createFoundObject = async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
     newFoundObjectData.category = category._id;
-    const subCategory = req.body.subCategory;    
+    const subCategory = req.body.subCategory;
     const newFoundObject = new FoundObjectModel(newFoundObjectData);
-    for (const key in subCategory) {
-      const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
-      if (!subCategoryCheck) {
-        return res.status(404).json({ error: 'SubCategory: ' + subCategory[key].name + ' not found' });
-      }
+    if (subCategory !== "{}") {
+        for (const key in subCategory) {
+          const subCategoryCheck = await SubCategoryModel.findOne({ name: subCategory[key].name, category: new ObjectId(category._id) });
+          if (!subCategoryCheck) {
+            return res.status(404).json({ error: 'SubCategory: ' + subCategory[key].name + ' not found' });
+          }
 
-      const subSubCategoryCheck = await SubSubCategoryModel.findOne({ name: subCategory[key].subSubCategory});
-      if (!subSubCategoryCheck) {
-        return res.status(404).json({ error: 'SubSubCategory: ' + subCategory[key].subCategory + ' not found' });
-      }
+          const subSubCategoryCheck = await SubSubCategoryModel.findOne({ name: subCategory[key].subSubCategory});
+          if (!subSubCategoryCheck) {
+            return res.status(404).json({ error: 'SubSubCategory: ' + subCategory[key].subCategory + ' not found' });
+          }
 
-      const subSubCategoryAssociationCheck = await SubSubCategoryAssociationModel.findOne({ subCategory: new ObjectId(subCategoryCheck._id), subSubCategory: new ObjectId(subSubCategoryCheck._id) });
-      if (!subSubCategoryAssociationCheck) {
-        return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and SubSubCategory ' + subCategory[key].subCategory + ' not associated'});
-      }
+          const subSubCategoryAssociationCheck = await SubSubCategoryAssociationModel.findOne({ subCategory: new ObjectId(subCategoryCheck._id), subSubCategory: new ObjectId(subSubCategoryCheck._id) });
+          if (!subSubCategoryAssociationCheck) {
+            return res.status(404).json({ error: 'SubCategory ' + subCategory[key].name + ' and SubSubCategory ' + subCategory[key].subCategory + ' not associated'});
+          }
 
-      const subCategoryArgs = {
-        object: newFoundObject._id,
-        subCategory: subCategoryCheck._id,
-        subSubCategory: subSubCategoryCheck._id
-      };
-      const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
-      await subCategoryFiltered.save();
+          const subCategoryArgs = {
+            object: newFoundObject._id,
+            subCategory: subCategoryCheck._id,
+            subSubCategory: subSubCategoryCheck._id
+          };
+          const subCategoryFiltered = new ObjSubCategoryModel(subCategoryArgs);
+          await subCategoryFiltered.save();
+        }
     }
 
     await newFoundObject.save();
